@@ -1,0 +1,51 @@
+# Reference links
+
+External resources for this project, kept in one place so they don't get duplicated/drift across `README.md`, `CLAUDE.md`, and `MEMORY.md`. Add to this file first; other docs should link here rather than repeating URLs.
+
+## Hardware / product
+
+CrowPanel ESP32 4.2" E-Paper HMI Display (Elecrow, SKU DIE07300S)
+[https://www.elecrow.com/crowpanel-esp32-4-2-e-paper-hmi-display-with-400-300-resolution-black-white-color-driven-by-spi-interface.html](https://www.elecrow.com/crowpanel-esp32-4-2-e-paper-hmi-display-with-400-300-resolution-black-white-color-driven-by-spi-interface.html)
+
+CrowPanel ESP32 E-Paper HMI 4.2" Display — Wiki
+[https://www.elecrow.com/wiki/CrowPanel_ESP32_E-paper_4.2-inch_HMI_Display.html](https://www.elecrow.com/wiki/CrowPanel_ESP32_E-paper_4.2-inch_HMI_Display.html)
+
+CrowPanel ESP32 E-Paper 4.2" Arduino Tutorial
+[https://www.elecrow.com/wiki/CrowPanel_ESP32_E-Paper_4.2-inch_Arduino_Tutorial.html](https://www.elecrow.com/wiki/CrowPanel_ESP32_E-Paper_4.2-inch_Arduino_Tutorial.html)
+
+Elecrow demo code (Arduino IDE)
+- Demos: [https://www.elecrow.com/download/product/CrowPanel/E-paper/4.2-DIE07300S/Arduino/Demos.zip](https://www.elecrow.com/download/product/CrowPanel/E-paper/4.2-DIE07300S/Arduino/Demos.zip)
+- Examples: [https://www.elecrow.com/download/product/CrowPanel/E-paper/4.2-DIE07300S/Arduino/Examples.zip](https://www.elecrow.com/download/product/CrowPanel/E-paper/4.2-DIE07300S/Arduino/Examples.zip)
+
+Elecrow GitHub (official)
+[https://github.com/Elecrow-RD/CrowPanel-ESP32-4.2-E-paper-HMI-Display-with-400-300](https://github.com/Elecrow-RD/CrowPanel-ESP32-4.2-E-paper-HMI-Display-with-400-300)
+
+papercodeIN/Elecrow — source of the `display_text/` reference sketch (`Wireless_Text_Display` project)
+[https://github.com/papercodeIN/Elecrow](https://github.com/papercodeIN/Elecrow)
+
+## E-paper driver (GxEPD2 / SSD1683)
+
+GxEPD2 — Arduino display library for SPI e-paper displays (used by `display_text/display_text.ino`)
+[https://github.com/ZinggJM/GxEPD2](https://github.com/ZinggJM/GxEPD2)
+
+CrowPanel 4.2" E-Paper with GxEPD2 (Makerguides tutorial)
+[https://www.makerguides.com/crowpanel-4-2-inch-e-paper-with-gxepd2/](https://www.makerguides.com/crowpanel-4-2-inch-e-paper-with-gxepd2/)
+
+SSD1683 eInk display with GxEPD and ESP32 (basics and configuration)
+[https://mischianti.org/ssd1683-eink-display-with-gxepd-and-esp32-and-crowpanel-4-2-hmi-basics-and-configuration/](https://mischianti.org/ssd1683-eink-display-with-gxepd-and-esp32-and-crowpanel-4-2-hmi-basics-and-configuration/)
+
+## Firmware toolchain
+
+Arduino core for ESP32 (Espressif) — board package providing `ESP32S3 Dev Module`, used by the current Arduino IDE setup (see `arduino-ide-setup.md`)
+[https://github.com/espressif/arduino-esp32](https://github.com/espressif/arduino-esp32)
+
+PlatformIO — planned firmware toolchain (not yet installed; see `CLAUDE.md`)
+[https://platformio.org/](https://platformio.org/) · docs: [https://docs.platformio.org/](https://docs.platformio.org/)
+
+## Android libraries (planned, not yet added to the project)
+
+usb-serial-for-android (mik3y) — planned USB serial transport library
+[https://github.com/mik3y/usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android)
+
+ZXing core — planned QR code generation library for milestone 2 (`com.google.zxing:core`, `QRCodeWriter`; note this is the generation-only core library, not the `journeyapps/zxing-android-embedded` scanning wrapper, since this project only needs to encode a URL into a QR bitmap)
+[https://github.com/zxing/zxing](https://github.com/zxing/zxing)
