@@ -50,10 +50,15 @@ PlatformIO — planned firmware toolchain (not yet installed; see `CLAUDE.md`)
 Pillow (PIL) — used by `receive_image/send_text.py` to rasterize text into the 400×300 bitmap sent to the panel (see `docs/dev-tools.md`)
 [https://pillow.readthedocs.io/](https://pillow.readthedocs.io/)
 
-## Android libraries (planned, not yet added to the project)
+## Android libraries (in use)
 
-usb-serial-for-android (mik3y) — planned USB serial transport library
+usb-serial-for-android (mik3y) — USB serial transport library used by `UsbSerialTransport.kt`; fetched from JitPack (see `docs/dev-tools.md` for the repository/dependency setup)
 [https://github.com/mik3y/usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android)
+
+Hilt — dependency injection, used for `CrowPanelHubApp`/`MainViewModel`/`UsbSerialTransport` (KSP-based annotation processing, not kapt)
+[https://dagger.dev/hilt/](https://dagger.dev/hilt/)
+
+## Android libraries (planned, not yet added to the project)
 
 ZXing core — planned QR code generation library for milestone 2 (`com.google.zxing:core`, `QRCodeWriter`; note this is the generation-only core library, not the `journeyapps/zxing-android-embedded` scanning wrapper, since this project only needs to encode a URL into a QR bitmap)
 [https://github.com/zxing/zxing](https://github.com/zxing/zxing)

@@ -21,16 +21,18 @@ void epdPower(int state) {
   digitalWrite(PWR, state);
 }
 
-// Labels the frame with the wall-clock time/date the sender supplied (UTC) --
-// the ESP32 has no RTC or Wi-Fi/NTP of its own (milestone 1 is USB-serial
-// only), so epochSeconds must come from the frame every time.
+// Labels the frame with the wall-clock time/date the sender supplied -- the
+// ESP32 has no RTC or Wi-Fi/NTP of its own (milestone 1 is USB-serial only),
+// so epochSeconds must come from the frame every time. Formatted as-is with
+// no timezone math -- the Android sender pre-applies its own local offset
+// before sending (see WireFrame.kt), so this is already local time.
 void drawUpdatedLabel(uint32_t epochSeconds) {
   time_t epoch = (time_t)epochSeconds;
   struct tm timeInfo;
   gmtime_r(&epoch, &timeInfo);
 
   char label[32];
-  strftime(label, sizeof(label), "%Y-%m-%d %H:%M:%S UTC", &timeInfo);
+  strftime(label, sizeof(label), "%Y-%m-%d %H:%M:%S", &timeInfo);
 
   const int labelHeight = 20;
   const int labelY = DISPLAY_HEIGHT - labelHeight;
