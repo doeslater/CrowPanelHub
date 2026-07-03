@@ -9,12 +9,12 @@
         android:rotation="0">
         <!-- Stylized 'C' monogram for CrowPanelHub -->
         <path
-            android:fillColor="@color/brand_green"
+            android:fillColor="@color/brand_primary"
             android:pathData="M54,28 C39.6,28 28,39.6 28,54 C28,68.4 39.6,80 54,80 C64,80 72.8,74.4 77.2,66 L68,60 C65.2,65 60,68 54,68 C46.2,68 40,61.8 40,54 C40,46.2 46.2,40 54,40 C60,40 65.2,43 68,48 L77.2,42 C72.8,33.6 64,28 54,28 Z" />
 
         <!-- Red 'P' monogram representing 'Panel' and 'Hub' -->
         <path
-            android:fillColor="#CC0000"
+            android:fillColor="@color/brand_primary"
             android:fillType="evenOdd"
             android:pathData="M47,43.2 L56,43.2 C61,43.2 61,55.2 56,55.2 L51,55.2 L51,64.8 L47,64.8 Z M51,47.2 L55,47.2 C57,47.2 57,51.2 55,51.2 L51,51.2 Z" />
     </group>
