@@ -26,6 +26,10 @@ build/
 *.ap_
 *.dex
 
+# Python (firmware test/bring-up scripts under receive_image/)
+__pycache__/
+*.pyc
+
 # macOS
 .DS_Store
 

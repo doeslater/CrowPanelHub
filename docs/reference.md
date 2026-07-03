@@ -39,8 +39,16 @@ SSD1683 eInk display with GxEPD and ESP32 (basics and configuration)
 Arduino core for ESP32 (Espressif) — board package providing `ESP32S3 Dev Module`, used by the current Arduino IDE setup (see `arduino-ide-setup.md`)
 [https://github.com/espressif/arduino-esp32](https://github.com/espressif/arduino-esp32)
 
+ESP32 board manager index (Espressif) — the `arduino-cli config add board_manager.additional_urls ...` URL that makes `esp32:esp32:*` boards installable via `arduino-cli core install esp32:esp32` (see `docs/dev-tools.md`)
+[https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json](https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json)
+
 PlatformIO — planned firmware toolchain (not yet installed; see `CLAUDE.md`)
 [https://platformio.org/](https://platformio.org/) · docs: [https://docs.platformio.org/](https://docs.platformio.org/)
+
+## Python libraries
+
+Pillow (PIL) — used by `receive_image/send_text.py` to rasterize text into the 400×300 bitmap sent to the panel (see `docs/dev-tools.md`)
+[https://pillow.readthedocs.io/](https://pillow.readthedocs.io/)
 
 ## Android libraries (planned, not yet added to the project)
 
