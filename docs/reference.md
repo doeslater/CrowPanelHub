@@ -55,8 +55,11 @@ Pillow (PIL) — used by `receive_image/send_text.py` to rasterize text into the
 usb-serial-for-android (mik3y) — USB serial transport library used by `UsbSerialTransport.kt`; fetched from JitPack (see `docs/dev-tools.md` for the repository/dependency setup)
 [https://github.com/mik3y/usb-serial-for-android](https://github.com/mik3y/usb-serial-for-android)
 
-Hilt — dependency injection, used for `CrowPanelHubApp`/`MainViewModel`/`UsbSerialTransport` (KSP-based annotation processing, not kapt)
+Hilt — dependency injection, used for `CrowPanelHubApp`/`MainViewModel`/`DiagnosticsViewModel`/`UsbSerialTransport` (KSP-based annotation processing, not kapt)
 [https://dagger.dev/hilt/](https://dagger.dev/hilt/)
+
+Navigation Compose — provides the two-route `NavHost` (`main`/`diagnostics`) in `MainActivity.kt`
+[https://developer.android.com/develop/ui/compose/navigation](https://developer.android.com/develop/ui/compose/navigation)
 
 ## Android libraries (planned, not yet added to the project)
 

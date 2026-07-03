@@ -17,13 +17,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 
 private const val BAUD_RATE = 115200
 private const val WRITE_TIMEOUT_MS = 5_000
+private const val MAX_LOG_ENTRIES = 100
 
-/** Mirrors the plain-text status the UI needs -- see MainViewModel's mapping. */
+data class LogEntry(val timestamp: Long, val message: String)
+
 sealed interface UsbConnectionState {
     data object Disconnected : UsbConnectionState
     data object RequestingPermission : UsbConnectionState
@@ -31,6 +34,16 @@ sealed interface UsbConnectionState {
     data object Connecting : UsbConnectionState
     data object Connected : UsbConnectionState
     data class ConnectFailed(val reason: String) : UsbConnectionState
+}
+
+/** Shared by MainViewModel and DiagnosticsViewModel -- both just display this state as text. */
+fun UsbConnectionState.toStatusText(): String = when (this) {
+    UsbConnectionState.Disconnected -> "Not connected"
+    UsbConnectionState.RequestingPermission -> "Requesting permission..."
+    UsbConnectionState.PermissionDenied -> "Permission denied"
+    UsbConnectionState.Connecting -> "Connecting..."
+    UsbConnectionState.Connected -> "Connected"
+    is UsbConnectionState.ConnectFailed -> "Connect failed: $reason"
 }
 
 /**
@@ -49,45 +62,65 @@ class UsbSerialTransport @Inject constructor(
     private val _connectionState = MutableStateFlow<UsbConnectionState>(UsbConnectionState.Disconnected)
     val connectionState: StateFlow<UsbConnectionState> = _connectionState.asStateFlow()
 
+    private val _logEntries = MutableStateFlow<List<LogEntry>>(emptyList())
+    val logEntries: StateFlow<List<LogEntry>> = _logEntries.asStateFlow()
+
     suspend fun connect() = withContext(Dispatchers.IO) {
         val driver = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager).firstOrNull()
         if (driver == null) {
-            _connectionState.value = UsbConnectionState.ConnectFailed("No USB serial device found")
+            updateState(UsbConnectionState.ConnectFailed("No USB serial device found"))
             return@withContext
         }
 
         val device = driver.device
         if (!usbManager.hasPermission(device)) {
-            _connectionState.value = UsbConnectionState.RequestingPermission
+            updateState(UsbConnectionState.RequestingPermission)
             if (!requestPermission(device)) {
-                _connectionState.value = UsbConnectionState.PermissionDenied
+                updateState(UsbConnectionState.PermissionDenied)
                 return@withContext
             }
         }
 
-        _connectionState.value = UsbConnectionState.Connecting
+        updateState(UsbConnectionState.Connecting)
         try {
             val connection = usbManager.openDevice(device)
             if (connection == null) {
-                _connectionState.value = UsbConnectionState.ConnectFailed("Could not open USB device")
+                updateState(UsbConnectionState.ConnectFailed("Could not open USB device"))
                 return@withContext
             }
             val openedPort = driver.ports.first()
             openedPort.open(connection)
             openedPort.setParameters(BAUD_RATE, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
             port = openedPort
-            _connectionState.value = UsbConnectionState.Connected
+            updateState(UsbConnectionState.Connected)
         } catch (e: Exception) {
-            _connectionState.value = UsbConnectionState.ConnectFailed(e.message ?: "Unknown error")
+            updateState(UsbConnectionState.ConnectFailed(e.message ?: "Unknown error"))
         }
     }
 
     suspend fun sendImage(payload: ByteArray): Result<Unit> = withContext(Dispatchers.IO) {
         val activePort = port
-            ?: return@withContext Result.failure(IllegalStateException("Not connected"))
+        if (activePort == null) {
+            log("Send failed: not connected")
+            return@withContext Result.failure(IllegalStateException("Not connected"))
+        }
+        log("Sending image (${payload.size} bytes)...")
         runCatching {
             activePort.write(WireFrame.build(payload), WRITE_TIMEOUT_MS)
+        }.onSuccess {
+            log("Image sent successfully")
+        }.onFailure { e ->
+            log("Send failed: ${e.message}")
         }
+    }
+
+    private fun updateState(state: UsbConnectionState) {
+        _connectionState.value = state
+        log(state.toStatusText())
+    }
+
+    private fun log(message: String) {
+        _logEntries.update { (it + LogEntry(System.currentTimeMillis(), message)).takeLast(MAX_LOG_ENTRIES) }
     }
 
     /**
