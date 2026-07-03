@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-"CrowPanelHub" is an exploration project for the **CrowPanel ESP32 4.2" e-paper HMI display** (see Sources below). The explicit goal is to understand the hardware and **help other developers dive into the ESP32 world** — this is a teaching/learning project, not a polished product. It is intended to be published as a **public repo under the MIT license** (not done yet — no `LICENSE` file, and the repo is not yet even a git repository as of this writing). The Android app (package `com.example.crowpanelhub`) is meant to become the companion app that sends images to the panel.
+"CrowPanelHub" is an exploration project for the **CrowPanel ESP32 4.2" e-paper HMI display** (see Sources below). The explicit goal is to understand the hardware and **help other developers dive into the ESP32 world** — this is a teaching/learning project, not a polished product. It's a public repo pushed to `github.com/doeslater/CrowPanelHub` with **no `LICENSE` file** — a deliberate choice to keep it unencumbered rather than adding MIT boilerplate, though note this legally defaults to all-rights-reserved rather than true public domain (an explicit public-domain dedication like The Unlicense/CC0 would be needed for that, if it's ever wanted). The Android app (package `com.example.crowpanelhub`) is meant to become the companion app that sends images to the panel.
 
 **Current state is a bare scaffold, on both sides — read this before trusting anything else in this file about "current" architecture:**
 - `app/` is an unmodified Android Studio "Empty Activity" (Compose) template: one `MainActivity`, one `Greeting` composable, default theme files. No navigation, no ViewModel, no repository, no hardware/transport integration exists yet.
@@ -46,10 +46,8 @@ USB serial was chosen to start (over Wi-Fi/BLE) because it needs no pairing/prov
 
 ## Open threads (not yet decided)
 
-- Copyright name/entity for the `LICENSE` file (MIT, once added).
 - Target URL the milestone-2 QR code should encode.
 - Error-state UX on Main/Diagnostics when USB permission is denied or the device disconnects mid-send.
-- When to `git init` and create the actual public GitHub repo (repo is not a git repository yet).
 - Migrating firmware to a PlatformIO project structure (`platformio.ini` + `src/`) instead of a bare `.ino`.
 
 ## Commands
