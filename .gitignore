@@ -35,3 +35,6 @@ build/
 # Lint
 /lint/intermediate/
 /lint/reports/
+
+# Local-only planning notes (kept on disk, not published)
+/MEMORY.md

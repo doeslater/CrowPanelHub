@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Do not assume any USB/BLE/Wi-Fi code, navigation, ViewModel, or repository code exists in this repo until it's actually been added — check the current files before referencing them, since most of this document (outside this section and Sources) describes the *planned* design, not what's built.
 
-See `MEMORY.md` at the repo root for the narrative/rationale behind earlier planning decisions. Note it was written before the app and firmware were reset to their current bare-scaffold state, so treat its description of "current" code the same way as this file's Planned sections — as intent, not fact.
+A `MEMORY.md` file at the repo root (gitignored, local-only — not on GitHub) holds the narrative/rationale behind earlier planning decisions, if present on this machine. Note it was written before the app and firmware were reset to their current bare-scaffold state, so treat its description of "current" code the same way as this file's Planned sections — as intent, not fact. Don't assume it exists on a fresh clone.
 
 ## Hardware target
 
