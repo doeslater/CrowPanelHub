@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 import dagger.hilt.android.qualifiers.ApplicationContext
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
@@ -65,36 +66,47 @@ class UsbSerialTransport @Inject constructor(
     private val _logEntries = MutableStateFlow<List<LogEntry>>(emptyList())
     val logEntries: StateFlow<List<LogEntry>> = _logEntries.asStateFlow()
 
+    // Guards against two overlapping connect() calls (e.g. a double-tap on
+    // Connect before connectionState first flips away from Disconnected) --
+    // without this, both calls could race through the permission-request
+    // BroadcastReceiver registration or both try to open the port.
+    private val isConnecting = AtomicBoolean(false)
+
     suspend fun connect() = withContext(Dispatchers.IO) {
-        val driver = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager).firstOrNull()
-        if (driver == null) {
-            updateState(UsbConnectionState.ConnectFailed("No USB serial device found"))
-            return@withContext
-        }
-
-        val device = driver.device
-        if (!usbManager.hasPermission(device)) {
-            updateState(UsbConnectionState.RequestingPermission)
-            if (!requestPermission(device)) {
-                updateState(UsbConnectionState.PermissionDenied)
-                return@withContext
-            }
-        }
-
-        updateState(UsbConnectionState.Connecting)
+        if (!isConnecting.compareAndSet(false, true)) return@withContext
         try {
-            val connection = usbManager.openDevice(device)
-            if (connection == null) {
-                updateState(UsbConnectionState.ConnectFailed("Could not open USB device"))
+            val driver = UsbSerialProber.getDefaultProber().findAllDrivers(usbManager).firstOrNull()
+            if (driver == null) {
+                updateState(UsbConnectionState.ConnectFailed("No USB serial device found"))
                 return@withContext
             }
-            val openedPort = driver.ports.first()
-            openedPort.open(connection)
-            openedPort.setParameters(BAUD_RATE, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
-            port = openedPort
-            updateState(UsbConnectionState.Connected)
-        } catch (e: Exception) {
-            updateState(UsbConnectionState.ConnectFailed(e.message ?: "Unknown error"))
+
+            val device = driver.device
+            if (!usbManager.hasPermission(device)) {
+                updateState(UsbConnectionState.RequestingPermission)
+                if (!requestPermission(device)) {
+                    updateState(UsbConnectionState.PermissionDenied)
+                    return@withContext
+                }
+            }
+
+            updateState(UsbConnectionState.Connecting)
+            try {
+                val connection = usbManager.openDevice(device)
+                if (connection == null) {
+                    updateState(UsbConnectionState.ConnectFailed("Could not open USB device"))
+                    return@withContext
+                }
+                val openedPort = driver.ports.first()
+                openedPort.open(connection)
+                openedPort.setParameters(BAUD_RATE, 8, UsbSerialPort.STOPBITS_1, UsbSerialPort.PARITY_NONE)
+                port = openedPort
+                updateState(UsbConnectionState.Connected)
+            } catch (e: Exception) {
+                updateState(UsbConnectionState.ConnectFailed(e.message ?: "Unknown error"))
+            }
+        } finally {
+            isConnecting.set(false)
         }
     }
 

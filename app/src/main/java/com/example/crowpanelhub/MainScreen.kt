@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -94,7 +93,12 @@ fun MainScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (state.isBusy) {
-                CircularProgressIndicator()
+                val progress = state.progressFraction
+                if (progress != null) {
+                    CircularProgressIndicator(progress = { progress })
+                } else {
+                    CircularProgressIndicator()
+                }
             }
 
             Text(

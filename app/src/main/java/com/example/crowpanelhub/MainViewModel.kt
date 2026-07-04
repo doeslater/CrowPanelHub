@@ -32,7 +32,8 @@ data class MainState(
     val statusText: String = "Not connected",
     val isConnected: Boolean = false,
     val isBusy: Boolean = false,
-    val progressFraction: Float = 0f,
+    // null while connecting (indeterminate) or idle; a real fraction only while a send is in flight.
+    val progressFraction: Float? = null,
 )
 
 sealed interface MainAction {
@@ -58,6 +59,7 @@ class MainViewModel @Inject constructor(
                         isConnected = connectionState is UsbConnectionState.Connected,
                         isBusy = connectionState is UsbConnectionState.Connecting ||
                             connectionState is UsbConnectionState.RequestingPermission,
+                        progressFraction = null,
                     )
                 }
             }
@@ -95,11 +97,11 @@ class MainViewModel @Inject constructor(
                     _state.update { it.copy(statusText = "Sent, panel refreshing...") }
                     delay(ESTIMATED_PANEL_REFRESH_COOLDOWN_MS)
                     progressJob.cancel()
-                    _state.update { it.copy(statusText = "Sent successfully", isBusy = false, progressFraction = 0f) }
+                    _state.update { it.copy(statusText = "Sent successfully", isBusy = false, progressFraction = null) }
                 }
                 .onFailure { e ->
                     progressJob.cancel()
-                    _state.update { it.copy(statusText = "Send failed: ${e.message}", isBusy = false, progressFraction = 0f) }
+                    _state.update { it.copy(statusText = "Send failed: ${e.message}", isBusy = false, progressFraction = null) }
                 }
         }
     }
