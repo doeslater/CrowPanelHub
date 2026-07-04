@@ -4,6 +4,7 @@ build/
 /local.properties
 
 # Android Studio / IntelliJ IDEA
+.idea
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/gradle.xml
@@ -26,9 +27,12 @@ build/
 *.ap_
 *.dex
 
-# Python (firmware test/bring-up scripts under receive_image/)
+# Python (firmware test/bring-up scripts under receive_image/, test_screen/)
 __pycache__/
 *.pyc
+
+# Regenerable output of test_screen/generate_test_pattern.py
+/test_screen/preview.png
 
 # macOS
 .DS_Store
@@ -40,5 +44,6 @@ __pycache__/
 /lint/intermediate/
 /lint/reports/
 
+.claude
 # Local-only planning notes (kept on disk, not published)
 /MEMORY.md

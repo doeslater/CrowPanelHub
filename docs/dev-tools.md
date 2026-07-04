@@ -160,6 +160,26 @@ typo there fails loudly rather than silently compiling with the wrong setting.
 `CLAUDE.md`) was compiled and flashed to an actual CrowPanel board on `/dev/ttyUSB0` with the same
 `--fqbn` string as above, and confirmed working via the serial round-trip described below.
 
+**Confirm what's actually flashed before debugging.** The board only remembers the last thing
+uploaded to it — that can be a sketch from a different directory, a different session, or one
+that was never committed to this repo (`arduino-cli` caches every compiled sketch under
+`~/.cache/arduino/sketches/`, keyed by a hash of its source path, independent of git). Each sketch
+here prints a distinct line early in `setup()` (`receive_image.ino` prints
+`"Receive Image Controller Starting..."`), so the fastest way to check is to read boot output
+right after a reset:
+
+```bash
+arduino-cli monitor -p /dev/ttyUSB0 -c baudrate=115200   # then power-cycle or reset the board
+```
+
+If the printed identity doesn't match the sketch you think you're testing against, that mismatch
+— not your script/payload — is almost certainly the bug. This cost a full debugging session once:
+a since-deleted, never-committed sketch (`test_screen.ino`, built outside this repo) was left
+flashed on the board, and its `setup()` blocked on a full e-paper refresh before entering `loop()`,
+silently truncating every incoming frame regardless of payload — `receive_image/`'s own
+already-verified test payload failed against it identically to the new one under investigation,
+which is what exposed it as a firmware-identity problem rather than a payload bug.
+
 ### Serial port permissions (Linux)
 
 Uploading/monitoring over `/dev/ttyUSB0` needs the device file to be readable/writable by your
