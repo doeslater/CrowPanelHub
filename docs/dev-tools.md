@@ -120,7 +120,7 @@ separately talk to the *ESP32* over USB) — don't conflate the two USB connecti
 ### `arduino-cli`
 
 The command-line equivalent of the Arduino IDE GUI — installed and used here to compile
-`display_text/` and to compile/upload/test `receive_image/` without ever opening the GUI,
+`firmwares/display_text/` and to compile/upload/test `firmwares/receive_image/` without ever opening the GUI,
 confirming the board config in `docs/arduino-ide-setup.md` translates directly into `arduino-cli`
 flags.
 
@@ -138,25 +138,31 @@ arduino-cli config add board_manager.additional_urls https://raw.githubuserconte
 arduino-cli core update-index
 
 arduino-cli core install esp32:esp32          # ESP32 board package (see docs/reference.md) — ~1GB, several minutes
-arduino-cli lib install GxEPD2                # e-paper driver library used by display_text/ (pulls in Adafruit GFX + BusIO)
+arduino-cli lib install GxEPD2                # e-paper driver library used by firmwares/display_text/ (pulls in Adafruit GFX + BusIO)
 
 arduino-cli board listall | grep -i esp32s3   # find the FQBN for "ESP32S3 Dev Module" -> esp32:esp32:esp32s3
 arduino-cli board details -b esp32:esp32:esp32s3   # list valid values for each --fqbn board-option (USBMode, PSRAM, etc.)
 
-# compile, matching the board options recorded in docs/arduino-ide-setup.md (works for either sketch):
-arduino-cli compile --fqbn "esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=default,PSRAM=opi,PartitionScheme=default" display_text/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32s3 receive_image/   # actually flashed to real hardware, see below
+# compile, matching the board options recorded in docs/arduino-ide-setup.md (works for any sketch):
+arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" firmwares/display_text/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" firmwares/receive_image/   # actually flashed to real hardware, see below
 arduino-cli monitor -p /dev/ttyUSB0 -c baudrate=115200
 ```
 
+`docs/fqbn.txt` holds that exact board-option string as the single source of
+truth — every sketch folder's `README.md` and `install.sh` reads it the same
+way, rather than each hardcoding its own copy that could drift out of sync.
+Each firmware folder also has its own `install.sh` (`./firmwares/receive_image/install.sh
+[port]`, etc.) that runs the two commands above for you.
+
 Confirmed working on this machine: the compile command above succeeds against the real
-`display_text/display_text.ino` (458,538 bytes / 34% program storage, 39,188 bytes / 11% dynamic
+`firmwares/display_text/display_text.ino` (458,538 bytes / 34% program storage, 39,188 bytes / 11% dynamic
 memory). The four `--fqbn` board-option values (`hwcdc`, `default`, `opi`, `default`) were checked
 against `arduino-cli board details` first — worth doing since `arduino-cli compile` does reject an
 invalid option value outright (`Error during build: invalid value '...' for option '...'`), so a
 typo there fails loudly rather than silently compiling with the wrong setting.
 
-`upload` has also been exercised for real: `receive_image/` (the milestone-1 firmware — see
+`upload` has also been exercised for real: `firmwares/receive_image/` (the milestone-1 firmware — see
 `CLAUDE.md`) was compiled and flashed to an actual CrowPanel board on `/dev/ttyUSB0` with the same
 `--fqbn` string as above, and confirmed working via the serial round-trip described below.
 
@@ -176,7 +182,7 @@ If the printed identity doesn't match the sketch you think you're testing agains
 — not your script/payload — is almost certainly the bug. This cost a full debugging session once:
 a since-deleted, never-committed sketch (`test_screen.ino`, built outside this repo) was left
 flashed on the board, and its `setup()` blocked on a full e-paper refresh before entering `loop()`,
-silently truncating every incoming frame regardless of payload — `receive_image/`'s own
+silently truncating every incoming frame regardless of payload — `firmwares/receive_image/`'s own
 already-verified test payload failed against it identically to the new one under investigation,
 which is what exposed it as a firmware-identity problem rather than a payload bug.
 
@@ -194,13 +200,13 @@ Group membership changes only apply to *new* login sessions, not the shell you r
 Rather than fully logging out, a subshell with the group applied immediately works too:
 
 ```bash
-sg dialout -c 'arduino-cli upload -p /dev/ttyUSB0 --fqbn esp32:esp32:esp32s3 receive_image/'
+sg dialout -c "arduino-cli upload -p /dev/ttyUSB0 --fqbn $(cat docs/fqbn.txt) firmwares/receive_image/"
 ```
 
 ### Python (serial control, no extra install)
 
 There's no Android sender yet to actually produce a wire-protocol frame, so a small Python script
-(`receive_image/send_test_frame.py`) stands in for it during firmware bring-up — it resets the
+(`firmwares/receive_image/send_test_frame.py`) stands in for it during firmware bring-up — it resets the
 board and sends a hand-built frame matching the protocol in `CLAUDE.md`. `pip`/`pyserial` weren't
 available on this machine (`python3 -m pip` → `No module named pip`, and installing it needs
 `sudo`/network access we didn't want to assume), so the script talks to the serial port using only
@@ -218,7 +224,7 @@ os.read(fd, 4096)                                         # read the board's Ser
 Run it directly once the board is flashed and plugged in:
 
 ```bash
-python3 receive_image/send_test_frame.py
+python3 firmwares/receive_image/send_test_frame.py
 ```
 
 A useful adjacent trick: `esptool` (bundled with the ESP32 core, not on `PATH` by itself) can
@@ -229,7 +235,7 @@ without waiting through another upload:
 ~/.arduino15/packages/esp32/tools/esptool_py/5.3.0/esptool --chip esp32s3 --port /dev/ttyUSB0 run
 ```
 
-`receive_image/send_text.py` builds on the same idea but sends rendered text instead of a
+`firmwares/receive_image/send_text.py` builds on the same idea but sends rendered text instead of a
 checkerboard — proof that `receive_image.ino` doesn't need to change at all to display something
 different, since it just draws whatever 15,000-byte bitmap it's handed. Unlike
 `send_test_frame.py`, this one isn't stdlib-only: it uses Pillow (`PIL`) to rasterize text with
@@ -238,8 +244,8 @@ happened to already be installed on this machine; where it isn't, `pip install p
 distro's `python3-pillow` package) is needed first.
 
 ```bash
-python3 receive_image/send_text.py "Hello World" "from Python" "over USB serial"
-python3 receive_image/send_text.py                              # uses built-in default lines
+python3 firmwares/receive_image/send_text.py "Hello World" "from Python" "over USB serial"
+python3 firmwares/receive_image/send_text.py                              # uses built-in default lines
 ```
 
 ## Planned (not installed yet)
@@ -249,7 +255,7 @@ python3 receive_image/send_text.py                              # uses built-in 
 The planned long-term firmware toolchain (see `CLAUDE.md`) — chosen over the Arduino IDE because
 it's scriptable and version-pins dependencies via `platformio.ini`, mirroring
 `gradle/libs.versions.toml` on the Android side. Not installed on this machine, and no
-`platformio.ini` exists in this repo yet (migrating `display_text/`, or writing the milestone-1
+`platformio.ini` exists in this repo yet (migrating `firmwares/display_text/`, or writing the milestone-1
 sketch directly as a PlatformIO project, is still pending — see `CLAUDE.md` Open threads).
 
 ```bash

@@ -4,7 +4,7 @@
  * Reads one length-prefixed bitmap frame from Serial (see config.h for the wire
  * protocol), verifies its checksum, and renders it to the e-paper panel with a
  * full refresh. Fire-and-forget: no acknowledgement is ever sent back to the
- * phone. Power-cycle/init pattern borrowed from display_text/display_text.ino.
+ * phone. Power-cycle/init pattern borrowed from firmwares/display_text/display_text.ino.
  */
 
 #include <time.h>

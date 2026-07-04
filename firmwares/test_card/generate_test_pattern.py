@@ -7,7 +7,7 @@ monochrome bitmap, sent to the already-flashed receive_image.ino firmware over
 serial. No firmware change is needed for this -- receive_image.ino only ever
 draws whatever bitmap it's given (and stamps the "last updated" timestamp
 itself), so this is the test-card equivalent of the checkerboard pattern in
-receive_image/send_test_frame.py: same wire protocol, same board, different
+firmwares/receive_image/send_test_frame.py: same wire protocol, same board, different
 payload.
 
 Band proportions and the border/grid cell size were measured from
@@ -34,7 +34,9 @@ import sys
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "receive_image"))
-from send_test_frame import DISPLAY_HEIGHT, DISPLAY_WIDTH, PAYLOAD_SIZE, send_payload  # noqa: E402
+from send_test_frame import send_payload  # noqa: E402
+
+from config_h import DISPLAY_HEIGHT, DISPLAY_WIDTH, PAYLOAD_SIZE  # noqa: E402
 
 PREVIEW_PATH = os.path.join(os.path.dirname(__file__), "preview.png")
 

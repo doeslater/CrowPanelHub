@@ -27,12 +27,14 @@ build/
 *.ap_
 *.dex
 
-# Python (firmware test/bring-up scripts under receive_image/, test_screen/)
+# Python (firmware test/bring-up scripts under firmwares/receive_image/, firmwares/test_card/)
 __pycache__/
 *.pyc
 
-# Regenerable output of test_screen/generate_test_pattern.py
-/test_screen/preview.png
+# Regenerable output of firmwares/test_card/generate_test_pattern.py and render_preview.py
+/firmwares/test_card/preview.png
+/firmwares/test_card/boot_preview.png
+
 
 # macOS
 .DS_Store

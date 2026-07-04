@@ -1,4 +1,4 @@
-# receive_image/
+# firmwares/receive_image/
 
 This is the milestone-1 firmware: it listens on USB serial for one
 length-prefixed bitmap frame, validates it, and renders it to the e-paper
@@ -15,6 +15,7 @@ why USB serial first, the Android side. This file stays narrowly focused on
 | File | What it is |
 | --- | --- |
 | `receive_image.ino` | The firmware itself — see the walkthrough below. |
+| `install.sh` | Compiles and uploads this sketch (`./install.sh [port]`) — reads the shared `docs/fqbn.txt`, see "Build and flash" below. |
 | `config.h` | Pin numbers, display size, and wire-protocol constants shared by the whole sketch. |
 | `send_test_frame.py` | Stdlib-only Python script standing in for the Android app during bring-up — resets the board and sends a checkerboard test frame. |
 | `send_text.py` | Same idea, but rasterizes text with Pillow instead of a checkerboard. |
@@ -42,6 +43,25 @@ One frame, sent phone/PC → ESP32:
 - **checksum**: an 8-bit sum (mod 256) of the payload bytes, so a corrupted
   transfer gets rejected instead of drawn.
 
+## Prerequisites
+
+Before building/flashing this sketch, you need (see `docs/dev-tools.md`'s
+`arduino-cli` section for the actual install commands):
+
+- `arduino-cli` installed and on `PATH`
+- The ESP32 board package installed (`arduino-cli core install esp32:esp32`),
+  with Espressif's board index registered first — it's a separate index
+  from Arduino's default one, so a plain `core update-index` alone won't
+  find it
+- The `GxEPD2` library installed (`arduino-cli lib install GxEPD2`, which
+  pulls in Adafruit GFX + BusIO automatically)
+- The board connected over USB and visible as a serial port (e.g.
+  `/dev/ttyUSB0` on Linux, via its CH340 USB-serial bridge — confirm with
+  `lsusb`/`arduino-cli board list`)
+- On Linux, your user in the `dialout` group — if `upload` fails with a
+  permissions error, see `docs/dev-tools.md`'s "Serial port permissions"
+  section
+
 ## Build and flash
 
 Built/flashed with `arduino-cli` (see `docs/dev-tools.md` at the repo root
@@ -50,8 +70,16 @@ run against this sketch):
 
 ```bash
 # from the repo root
-arduino-cli compile --fqbn "esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=default,PSRAM=opi,PartitionScheme=default" receive_image/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn "esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=default,PSRAM=opi,PartitionScheme=default" receive_image/
+arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" firmwares/receive_image/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" firmwares/receive_image/
+```
+
+Or, more simply, run `firmwares/receive_image/install.sh` (optionally passing a port,
+defaulting to `/dev/ttyUSB0`) — it runs those same two commands, reading the
+same `docs/fqbn.txt`:
+
+```bash
+./firmwares/receive_image/install.sh
 ```
 
 `/dev/ttyUSB0` is this board's port on Linux with its CH340 USB-serial
@@ -73,9 +101,9 @@ Once the firmware above is flashed, either Python script builds a frame
 matching the wire protocol above and sends it over the same port:
 
 ```bash
-python3 receive_image/send_test_frame.py                 # checkerboard pattern
-python3 receive_image/send_text.py                       # built-in default text lines
-python3 receive_image/send_text.py "Hello" "from Python"  # or your own lines
+python3 firmwares/receive_image/send_test_frame.py                 # checkerboard pattern
+python3 firmwares/receive_image/send_text.py                       # built-in default text lines
+python3 firmwares/receive_image/send_text.py "Hello" "from Python"  # or your own lines
 ```
 
 Both reset the board first (a DTR/RTS pulse), print whatever the board logs
@@ -123,9 +151,9 @@ reassembly works, etc.) than the diagram does.
 No diagramming tool (`graphviz`, `mermaid-cli`) is installed on the
 reference dev machine, and installing one needs a system package. So
 `generate_flowchart.py` hand-draws the diagram with Pillow instead — the
-same approach `test_screen/generate_test_pattern.py` uses for its bitmap.
+same approach `firmwares/test_card/generate_test_pattern.py` uses for its bitmap.
 Edit the script and rerun it if `receive_image.ino`'s logic changes:
 
 ```bash
-python3 receive_image/generate_flowchart.py   # from the repo root, like the commands above
+python3 firmwares/receive_image/generate_flowchart.py   # from the repo root, like the commands above
 ```
