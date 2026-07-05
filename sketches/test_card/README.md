@@ -1,10 +1,10 @@
-# firmwares/test_card/
+# sketches/test_card/
 
 **Role: test tooling.** Independent boot self-test plus wire-protocol
 receiver, not a replacement for `receive_image`.
 
 A second, independent firmware for this board — a sibling of
-`firmwares/receive_image/receive_image.ino`, not a replacement for it. It draws a
+`sketches/receive_image/receive_image.ino`, not a replacement for it. It draws a
 Philips PM5544-style broadcast test card (checkered border, dithered
 gray-grid background, five-band circle) directly on boot, no phone or PC
 needed, and also accepts wire-protocol frames over Serial afterwards, same
@@ -25,7 +25,7 @@ see `CLAUDE.md`'s Commands section for the full story.
 | --- | --- |
 | `test_card.ino` | The firmware itself — see the walkthrough below. |
 | `install.sh` | Compiles and uploads this sketch (`./install.sh [port]`) — reads the shared `docs/fqbn.txt`, see "Build and flash" below. |
-| `config.h` | Pin numbers, display size, and wire-protocol constants — identical protocol to `firmwares/receive_image/config.h`, kept as its own copy per this repo's convention of self-contained sketch folders. Also the single source of truth for these constants on the Python side — see `config_h.py`. |
+| `config.h` | Pin numbers, display size, and wire-protocol constants — identical protocol to `sketches/receive_image/config.h`, kept as its own copy per this repo's convention of self-contained sketch folders. Also the single source of truth for these constants on the Python side — see `config_h.py`. |
 | `config_h.py` | Parses `config.h` so `generate_test_pattern.py`/`render_preview.py` don't hardcode a value `config.h` already defines. |
 | `generate_test_pattern.py` | Builds the same PM5544-style card as a full-canvas (no reserved label strip) payload and sends it to the board over the wire protocol — see "Sending a test frame" below. |
 | `render_preview.py` | Renders a PNG (`boot_preview.png`) of exactly what `test_card.ino`'s own boot self-test draws, without needing hardware — see "Previewing without hardware" below. |
@@ -36,7 +36,7 @@ see `CLAUDE.md`'s Commands section for the full story.
 
 ## Prerequisites
 
-Same as `firmwares/receive_image/` (see `docs/dev-tools.md`'s `arduino-cli` section
+Same as `sketches/receive_image/` (see `docs/dev-tools.md`'s `arduino-cli` section
 for the actual install commands):
 
 - `arduino-cli` installed and on `PATH`
@@ -55,21 +55,21 @@ for the actual install commands):
 
 ## Build and flash
 
-Same toolchain as `firmwares/receive_image/` — see `docs/dev-tools.md` at the repo
+Same toolchain as `sketches/receive_image/` — see `docs/dev-tools.md` at the repo
 root for install steps and more detail:
 
 ```bash
 # from the repo root
-arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" firmwares/test_card/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" firmwares/test_card/
+arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" sketches/test_card/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/test_card/
 ```
 
-Or, more simply, run `firmwares/test_card/install.sh` (optionally passing a port,
+Or, more simply, run `sketches/test_card/install.sh` (optionally passing a port,
 defaulting to `/dev/ttyUSB0`) — it runs those same two commands, reading the
 same `docs/fqbn.txt`:
 
 ```bash
-./firmwares/test_card/install.sh
+./sketches/test_card/install.sh
 ```
 
 Once flashed, the panel should show the built-in PM5544-style test card
@@ -111,14 +111,14 @@ label strip itself afterwards, so the received frame and the boot self-test
 don't need pixel-identical layouts:
 
 ```bash
-python3 firmwares/test_card/generate_test_pattern.py --send
+python3 sketches/test_card/generate_test_pattern.py --send
 ```
 
-`firmwares/receive_image/send_test_frame.py` also still works if you just want a
+`sketches/receive_image/send_test_frame.py` also still works if you just want a
 plain checkerboard instead:
 
 ```bash
-python3 firmwares/receive_image/send_test_frame.py
+python3 sketches/receive_image/send_test_frame.py
 ```
 
 A real send should end with this sketch printing `frame ok, <label>`, and
@@ -133,8 +133,8 @@ layout — the two intentionally differ, see above), useful for checking the
 card or the "last updated" label placement without flashing anything:
 
 ```bash
-python3 firmwares/test_card/render_preview.py                          # boot self-test, no label
-python3 firmwares/test_card/render_preview.py "Last updated: 2026-07-04 15:35:31"
+python3 sketches/test_card/render_preview.py                          # boot self-test, no label
+python3 sketches/test_card/render_preview.py "Last updated: 2026-07-04 15:35:31"
 ```
 
 Saves to `boot_preview.png`, deliberately a different filename from
@@ -148,7 +148,7 @@ images and would otherwise silently overwrite each other.
 Read this alongside `test_card.ino` — the inline comments there go into
 more depth on individual pieces than the diagram does. The wire-protocol
 half (`receiveFrame()`/`loop()`/`renderPayload()`) follows the same
-structure as `firmwares/receive_image/receive_image.ino`'s `handleFrame()`/`loop()`
+structure as `sketches/receive_image/receive_image.ino`'s `handleFrame()`/`loop()`
 — see that folder's README for a walkthrough of that part. What's unique
 to this sketch is how it builds its boot pattern:
 
@@ -179,10 +179,10 @@ to this sketch is how it builds its boot pattern:
 
 ## Regenerating the flowchart
 
-Same approach as `firmwares/receive_image/generate_flowchart.py` (hand-drawn with
+Same approach as `sketches/receive_image/generate_flowchart.py` (hand-drawn with
 Pillow — see that script's docstring for why no `graphviz`/`mermaid-cli` is
 used). Edit the script and rerun it if `test_card.ino`'s logic changes:
 
 ```bash
-python3 firmwares/test_card/generate_flowchart.py   # from the repo root
+python3 sketches/test_card/generate_flowchart.py   # from the repo root
 ```

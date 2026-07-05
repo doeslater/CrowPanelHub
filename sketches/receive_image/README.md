@@ -1,4 +1,4 @@
-# firmwares/receive_image/
+# sketches/receive_image/
 
 **Role: active milestone-1 firmware.** The image-transfer path the Android
 app's send flow targets.
@@ -73,16 +73,16 @@ run against this sketch):
 
 ```bash
 # from the repo root
-arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" firmwares/receive_image/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" firmwares/receive_image/
+arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" sketches/receive_image/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/receive_image/
 ```
 
-Or, more simply, run `firmwares/receive_image/install.sh` (optionally passing a port,
+Or, more simply, run `sketches/receive_image/install.sh` (optionally passing a port,
 defaulting to `/dev/ttyUSB0`) — it runs those same two commands, reading the
 same `docs/fqbn.txt`:
 
 ```bash
-./firmwares/receive_image/install.sh
+./sketches/receive_image/install.sh
 ```
 
 `/dev/ttyUSB0` is this board's port on Linux with its CH340 USB-serial
@@ -104,9 +104,9 @@ Once the firmware above is flashed, either Python script builds a frame
 matching the wire protocol above and sends it over the same port:
 
 ```bash
-python3 firmwares/receive_image/send_test_frame.py                 # checkerboard pattern
-python3 firmwares/receive_image/send_text.py                       # built-in default text lines
-python3 firmwares/receive_image/send_text.py "Hello" "from Python"  # or your own lines
+python3 sketches/receive_image/send_test_frame.py                 # checkerboard pattern
+python3 sketches/receive_image/send_text.py                       # built-in default text lines
+python3 sketches/receive_image/send_text.py "Hello" "from Python"  # or your own lines
 ```
 
 Both reset the board first (a DTR/RTS pulse), print whatever the board logs
@@ -154,9 +154,9 @@ reassembly works, etc.) than the diagram does.
 No diagramming tool (`graphviz`, `mermaid-cli`) is installed on the
 reference dev machine, and installing one needs a system package. So
 `generate_flowchart.py` hand-draws the diagram with Pillow instead — the
-same approach `firmwares/test_card/generate_test_pattern.py` uses for its bitmap.
+same approach `sketches/test_card/generate_test_pattern.py` uses for its bitmap.
 Edit the script and rerun it if `receive_image.ino`'s logic changes:
 
 ```bash
-python3 firmwares/receive_image/generate_flowchart.py   # from the repo root, like the commands above
+python3 sketches/receive_image/generate_flowchart.py   # from the repo root, like the commands above
 ```

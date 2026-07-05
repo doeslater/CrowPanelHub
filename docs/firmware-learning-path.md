@@ -1,6 +1,6 @@
 # Firmware learning path
 
-A suggested order for reading `firmwares/`'s three sketches if you're new
+A suggested order for reading `sketches/`'s three sketches if you're new
 to ESP32/embedded development — each one introduces a small set of new
 concepts on top of the last, rather than throwing everything at you at
 once. This doc is just the ordering and the "why this concept, why now"
@@ -14,7 +14,7 @@ path teaches ESP32/Arduino-specific and hardware concepts, not programming
 from zero. You'll also want the toolchain set up — see `docs/dev-tools.md`
 for installing `arduino-cli` and flashing a board.
 
-## Stage 1 — `firmwares/display_text/`
+## Stage 1 — `sketches/display_text/`
 
 **Start here.** This sketch has no serial protocol at all — it draws a
 fixed set of hardcoded text rows once, on boot, and does nothing else.
@@ -30,11 +30,11 @@ New concepts this stage introduces:
 - Drawing text and calling a full e-paper refresh (`epd.display()`) —
   and why e-paper needs an explicit refresh call at all, unlike an LCD.
 
-Read `firmwares/display_text/README.md` for the full walkthrough. Try
+Read `sketches/display_text/README.md` for the full walkthrough. Try
 tinkering: change the hardcoded text, add a row, or change a font size,
 then reflash and watch the panel update.
 
-## Stage 2 — `firmwares/receive_image/`
+## Stage 2 — `sketches/receive_image/`
 
 This is where the phone/PC actually gets involved. Everything from Stage
 1's display calls still applies (same init/power-cycle/refresh pattern) —
@@ -56,13 +56,13 @@ New concepts this stage introduces:
   (see `CLAUDE.md`'s wire protocol notes for the phone-side trick that
   makes that OK).
 
-Read `firmwares/receive_image/README.md` and its flowchart for the full
+Read `sketches/receive_image/README.md` and its flowchart for the full
 frame-by-frame walkthrough. Try tinkering: run
 `send_test_frame.py`/`send_text.py` to send a real frame, then deliberately
 flip a byte in a copy of the script and watch the checksum-mismatch
 rejection in the serial monitor.
 
-## Stage 3 — `firmwares/test_card/`
+## Stage 3 — `sketches/test_card/`
 
 The most involved sketch. It does everything `receive_image.ino` does
 (same wire protocol, same rendering), *plus* it draws its own test pattern
@@ -84,14 +84,14 @@ New concepts this stage introduces:
   `CLAUDE.md`'s "confirm what's actually flashed" note for the war story
   behind why this matters.)
 
-Read `firmwares/test_card/README.md` and its flowchart for the full
+Read `sketches/test_card/README.md` and its flowchart for the full
 walkthrough. Try tinkering: change one band's pattern function, or adjust
 the dithering threshold (`value < 128`) and see how the test card's
 gradient band changes.
 
 ## After this
 
-At this point you've seen the full range of what's in `firmwares/` today.
+At this point you've seen the full range of what's in `sketches/` today.
 From here, `CLAUDE.md`'s "Open threads" section lists what's genuinely
 unbuilt (Wi-Fi/BLE transports, error-state UX, a PlatformIO migration) if
 you're looking for a next thing to build rather than read.

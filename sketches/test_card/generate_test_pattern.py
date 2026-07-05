@@ -7,7 +7,7 @@ monochrome bitmap, sent to the already-flashed receive_image.ino firmware over
 serial. No firmware change is needed for this -- receive_image.ino only ever
 draws whatever bitmap it's given (and stamps the "last updated" timestamp
 itself), so this is the test-card equivalent of the checkerboard pattern in
-firmwares/receive_image/send_test_frame.py: same wire protocol, same board, different
+sketches/receive_image/send_test_frame.py: same wire protocol, same board, different
 payload.
 
 Band proportions and the border/grid cell size were measured from

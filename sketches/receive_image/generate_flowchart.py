@@ -8,7 +8,7 @@ with the source.
 No diagramming library (graphviz/mermaid) is installed on this machine and
 installing one needs a system package (sudo), so this hand-draws boxes,
 diamonds, and connector arrows directly with Pillow -- the same approach
-firmwares/test_card/generate_test_pattern.py uses for its bitmap. Text is kept
+sketches/test_card/generate_test_pattern.py uses for its bitmap. Text is kept
 plain-ASCII on purpose: Pillow's bundled default font has no glyphs for
 em-dashes/bullets/arrows and silently renders them as "missing glyph" boxes.
 

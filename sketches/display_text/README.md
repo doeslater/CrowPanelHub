@@ -1,4 +1,4 @@
-# firmwares/display_text/
+# sketches/display_text/
 
 **Role: reference.** Not flashed as "the" firmware — consult for GxEPD2
 init/pin-mapping/power-cycle patterns only.
@@ -11,7 +11,7 @@ no serial receive loop, no wire protocol, nothing wired to a phone or PC.
 **This folder is a deliberate reference example, not a spike to evolve.**
 It's kept here to show working GxEPD2 init/pin-mapping/power-cycle
 patterns — see `CLAUDE.md` (repo root) for the project-wide picture. It
-predates this repo's wire-protocol firmware (`firmwares/receive_image/`, `firmwares/test_card/`)
+predates this repo's wire-protocol firmware (`sketches/receive_image/`, `sketches/test_card/`)
 and isn't meant to grow into them; consult it for patterns when writing new
 sketches, rather than editing it in place.
 
@@ -50,16 +50,16 @@ at the repo root for install steps and more detail:
 
 ```bash
 # from the repo root
-arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" firmwares/display_text/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" firmwares/display_text/
+arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" sketches/display_text/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/display_text/
 ```
 
-Or, more simply, run `firmwares/display_text/install.sh` (optionally passing a port,
+Or, more simply, run `sketches/display_text/install.sh` (optionally passing a port,
 defaulting to `/dev/ttyUSB0`) — it runs those same two commands, reading the
 same `docs/fqbn.txt`:
 
 ```bash
-./firmwares/display_text/install.sh
+./sketches/display_text/install.sh
 ```
 
 This sketch has been flashed to and verified against real hardware — the

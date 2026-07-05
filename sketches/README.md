@@ -1,4 +1,4 @@
-# firmwares/
+# sketches/
 
 Every ESP32 Arduino sketch for this project lives here, as sibling
 subfolders — a repo-root sibling of `app/` (the Android side). See
@@ -29,7 +29,7 @@ Commands section for the story.
 ## Installing a sketch
 
 Each sketch folder has its own prerequisites, "Build and flash" section,
-and `install.sh` (`./firmwares/<name>/install.sh [port]`, defaulting to
+and `install.sh` (`./sketches/<name>/install.sh [port]`, defaulting to
 `/dev/ttyUSB0`) — see that folder's README for the specifics. All three
 share one thing in common:
 
@@ -51,7 +51,7 @@ three moved here) leaves the old path's cache entry behind as orphaned
 clutter. Run it any time you want a guaranteed-clean rebuild:
 
 ```bash
-./firmwares/clear-cache.sh
+./sketches/clear-cache.sh
 ```
 
 It clears the whole cache unconditionally rather than trying to detect

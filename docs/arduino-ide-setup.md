@@ -1,6 +1,6 @@
 # Arduino IDE setup for the CrowPanel ESP32-S3 board
 
-Transcribed from `screenshot_2026-01-03_20-34-42.png` (Arduino IDE `Tools` menu), captured during a successful upload of `firmwares/display_text/display_text.ino` (console showed `Done uploading.` / `Hard resetting via RTS pin...`). This is a known-working configuration for this board, not the current machine's installed toolchain (Arduino IDE isn't installed here — see `CLAUDE.md`).
+Transcribed from `screenshot_2026-01-03_20-34-42.png` (Arduino IDE `Tools` menu), captured during a successful upload of `sketches/display_text/display_text.ino` (console showed `Done uploading.` / `Hard resetting via RTS pin...`). This is a known-working configuration for this board, not the current machine's installed toolchain (Arduino IDE isn't installed here — see `CLAUDE.md`).
 
 - **Arduino IDE version**: 1.8.19
 

@@ -4,7 +4,7 @@
 # arduino-cli caches every compiled sketch under ~/.cache/arduino/sketches/,
 # keyed by a hash of the sketch's source *path* -- not its name or content.
 # That means moving or renaming a sketch folder (as happened when these
-# firmwares moved from the repo root into firmwares/) leaves the old
+# sketches moved from the repo root into sketches/) leaves the old
 # path's cache entry behind as orphaned clutter, since a new hash/entry
 # gets created for the new path instead of reusing the old one.
 #

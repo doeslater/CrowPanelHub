@@ -7,7 +7,7 @@ Connect has succeeded. Every node's wording matches the actual code/state
 names in MainViewModel.kt/UsbSerialTransport.kt, so android-app.md and the
 diagram can be read side by side with the source.
 
-Same approach as firmwares/receive_image/generate_flowchart.py: no
+Same approach as sketches/receive_image/generate_flowchart.py: no
 diagramming library (graphviz/mermaid) is installed on this machine and
 installing one needs a system package (sudo), so this hand-draws boxes,
 diamonds, and connector arrows directly with Pillow. Text is kept

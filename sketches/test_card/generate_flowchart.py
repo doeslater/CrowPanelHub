@@ -5,7 +5,7 @@ and then the same wire-protocol frame handling receive_image.ino uses.
 Every node's wording matches the actual code/log messages in test_card.ino,
 so README.md and the diagram can be read side by side with the source.
 
-Same approach as firmwares/receive_image/generate_flowchart.py (see that file's
+Same approach as sketches/receive_image/generate_flowchart.py (see that file's
 docstring for why: no graphviz/mermaid installed, so this hand-draws boxes,
 diamonds, and connector arrows directly with Pillow). Kept as a separate,
 self-contained script rather than a shared import, matching this repo's

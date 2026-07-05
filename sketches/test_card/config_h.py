@@ -1,5 +1,5 @@
 """
-Reads firmwares/test_card/config.h so the Python scripts in this folder never
+Reads sketches/test_card/config.h so the Python scripts in this folder never
 hardcode a value that's already defined there -- config.h is the single
 source of truth for these constants, this module just parses it.
 
