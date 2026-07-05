@@ -18,9 +18,14 @@ Usage:
 Requires Pillow (`pip install pillow`).
 """
 
+import os
+
 from PIL import Image, ImageDraw, ImageFont
 
-OUT_PATH = "flowchart.png"
+# Resolved against this script's own location, not the current working
+# directory, so "run from the repo root" (see README.md) saves next to this
+# script rather than into the repo root.
+OUT_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "flowchart.png")
 
 MAIN_X = 560  # center x of the main (happy-path) column -- kept well clear of
               # the canvas's left edge since two loop-back arcs swing left of it

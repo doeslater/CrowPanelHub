@@ -5,13 +5,18 @@ subfolders — a repo-root sibling of `app/` (the Android side). See
 `CLAUDE.md` (repo root) for the project-wide picture; this file stays
 narrowly focused on this folder.
 
+**New to ESP32/embedded development?** See
+[`docs/firmware-learning-path.md`](../docs/firmware-learning-path.md) for a
+suggested reading order across these three sketches, simplest concepts
+first.
+
 ## Sketches
 
-| Folder | What it is |
-| --- | --- |
-| [`display_text/`](display_text/README.md) | A standalone reference sketch (not wired to anything) demonstrating GxEPD2 init/pin-mapping/power-cycle patterns. Deliberately kept as-is — consult it for patterns, don't evolve it. |
-| [`receive_image/`](receive_image/README.md) | The milestone-1 firmware: listens on USB serial for one wire-protocol frame, validates it, and renders it with a full e-paper refresh. Hardware-verified. |
-| [`test_card/`](test_card/README.md) | A second, independent firmware: draws a built-in Philips PM5544-style test card on boot (no phone/PC needed), and also accepts the same wire-protocol frames `receive_image.ino` does. Hardware-verified. |
+| Folder | Role | What it is |
+| --- | --- | --- |
+| [`display_text/`](display_text/README.md) | Reference | A standalone reference sketch (not wired to anything) demonstrating GxEPD2 init/pin-mapping/power-cycle patterns. Deliberately kept as-is — consult it for patterns, don't evolve it. |
+| [`receive_image/`](receive_image/README.md) | Active (milestone 1) | The milestone-1 firmware: listens on USB serial for one wire-protocol frame, validates it, and renders it with a full e-paper refresh. Hardware-verified. |
+| [`test_card/`](test_card/README.md) | Test tooling | A second, independent firmware: draws a built-in Philips PM5544-style test card on boot (no phone/PC needed), and also accepts the same wire-protocol frames `receive_image.ino` does. Hardware-verified. |
 
 **Only one sketch is ever flashed on the board at a time.** Don't assume
 which one is currently on a board you didn't just flash yourself — each

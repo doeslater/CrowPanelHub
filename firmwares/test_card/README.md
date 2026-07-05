@@ -1,5 +1,8 @@
 # firmwares/test_card/
 
+**Role: test tooling.** Independent boot self-test plus wire-protocol
+receiver, not a replacement for `receive_image`.
+
 A second, independent firmware for this board — a sibling of
 `firmwares/receive_image/receive_image.ino`, not a replacement for it. It draws a
 Philips PM5544-style broadcast test card (checkered border, dithered

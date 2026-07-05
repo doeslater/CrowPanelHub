@@ -1,5 +1,8 @@
 # firmwares/display_text/
 
+**Role: reference.** Not flashed as "the" firmware — consult for GxEPD2
+init/pin-mapping/power-cycle patterns only.
+
 A standalone Arduino sketch, adapted from a third-party Elecrow example
 ([source](https://github.com/papercodeIN/Elecrow/tree/main/CrowPanel%20-%20ESP32%20E-Paper%20HMI%20Display%20-%204.2%20Inch/Project/Wireless_Text_Display%20-%2023-SEP-2025)).
 It renders a fixed set of hardcoded text rows to the panel once, on boot —

@@ -31,8 +31,6 @@ A `MEMORY.md` file at the repo root (gitignored, local-only — not on GitHub) h
 
 **Milestone 1**: send a bitmap from the phone to the ESP32 over USB serial and see it render on the panel, using a full (not partial) e-paper refresh. This is fire-and-forget: the ESP32 does not send anything back, and Android considers the send successful once the bytes are written to the serial port. Visual confirmation is by looking at the panel during bring-up. **Done, on both sides, and hardware-verified**: the firmware (`firmwares/receive_image/`) receives/verifies/renders the wire-protocol frame; the Android app connects over USB serial and can send either a programmatically-generated checkerboard (`Checkerboard.kt` — a small loop building packed 1-bit bytes, no bundled binary asset, so the code stays readable/teachable) or rendered demo text (`TextBitmap.kt`, drawn via Android's `Canvas`/`Paint`), via two separate buttons — "Send Text" and "Send Checkerboard" — rather than the single "Send (test pattern)" button originally planned (see Architecture below for why both were kept). Both patterns have been confirmed rendering correctly on a real CrowPanel board.
 
-**Milestone 2** (after milestone 1 works): swap the checkerboard for a QR code (via a library such as ZXing) that links to information about the project/how it was built — the panel becomes something a person could scan and learn from. The QR's target URL is not yet decided.
-
 USB serial was chosen to start (over Wi-Fi/BLE) because it needs no pairing/provisioning UI, giving the tightest feedback loop while the ESP32-side rendering path is still being proven out.
 
 ## Transport & wire protocol
@@ -55,7 +53,7 @@ USB serial was chosen to start (over Wi-Fi/BLE) because it needs no pairing/prov
 
 ## Open threads (not yet decided)
 
-- Target URL the milestone-2 QR code should encode.
+- Error-state UX for USB permission denial.
 - Migrating firmware to a PlatformIO project structure (`platformio.ini` + `src/`) instead of a bare `.ino`.
 
 ## Commands
@@ -125,6 +123,6 @@ Firmware is built/flashed via `arduino-cli`, not the Arduino IDE and not Platfor
 
 ## Sources
 
-See `docs/reference.md` for all external links (hardware/product pages, GxEPD2, Arduino-ESP32 core, PlatformIO, `usb-serial-for-android`/Hilt in use, and ZXing planned) — kept in one file so they don't drift out of sync across `README.md`/`CLAUDE.md`/`MEMORY.md`. Add new links there first.
+See `docs/reference.md` for all external links (hardware/product pages, GxEPD2, Arduino-ESP32 core, PlatformIO, `usb-serial-for-android`/Hilt in use) — kept in one file so they don't drift out of sync across `README.md`/`CLAUDE.md`/`MEMORY.md`. Add new links there first.
 
 See `docs/dev-tools.md` for command-line tools used (or planned) on this project — git, the Gradle wrapper, the `android` CLI/`adb`, and the Arduino/PlatformIO firmware toolchain — with install steps and the actual commands run here. This exists because the project's explicit goal is to help other developers learn the tooling, not just read the code (see Project overview above).

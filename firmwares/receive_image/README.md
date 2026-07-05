@@ -1,5 +1,8 @@
 # firmwares/receive_image/
 
+**Role: active milestone-1 firmware.** The image-transfer path the Android
+app's send flow targets.
+
 This is the milestone-1 firmware: it listens on USB serial for one
 length-prefixed bitmap frame, validates it, and renders it to the e-paper
 panel with a full refresh. It's fire-and-forget — the ESP32 never sends

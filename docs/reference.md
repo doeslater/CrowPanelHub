@@ -60,8 +60,3 @@ Hilt — dependency injection, used for `CrowPanelHubApp`/`MainViewModel`/`Diagn
 
 Navigation Compose — provides the two-route `NavHost` (`main`/`diagnostics`) in `MainActivity.kt`
 [https://developer.android.com/develop/ui/compose/navigation](https://developer.android.com/develop/ui/compose/navigation)
-
-## Android libraries (planned, not yet added to the project)
-
-ZXing core — planned QR code generation library for milestone 2 (`com.google.zxing:core`, `QRCodeWriter`; note this is the generation-only core library, not the `journeyapps/zxing-android-embedded` scanning wrapper, since this project only needs to encode a URL into a QR bitmap)
-[https://github.com/zxing/zxing](https://github.com/zxing/zxing)
