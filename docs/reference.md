@@ -60,3 +60,34 @@ Hilt — dependency injection, used for `CrowPanelHubApp`/`MainViewModel`/`Diagn
 
 Navigation Compose — provides the two-route `NavHost` (`main`/`diagnostics`) in `MainActivity.kt`
 [https://developer.android.com/develop/ui/compose/navigation](https://developer.android.com/develop/ui/compose/navigation)
+
+## Community projects (prior art)
+
+What other developers have built with ESP32 + e-ink — collected while researching `ideas.md`'s idea pool.
+
+lmarzen/esp32-weather-epd — the flagship low-power e-paper weather display (OpenWeatherMap; ~14µA deep sleep, 6–12 months per battery charge)
+[https://github.com/lmarzen/esp32-weather-epd](https://github.com/lmarzen/esp32-weather-epd)
+
+G6EJD/ESP32-e-Paper-Weather-Display — weather display supporting 2.9"/4.2"/7.5" panels (including 4.2" like this project's)
+[https://github.com/G6EJD/ESP32-e-Paper-Weather-Display](https://github.com/G6EJD/ESP32-e-Paper-Weather-Display)
+
+wuspy/portal_calendar — Portal-themed e-ink calendar, runs for years on AAA batteries
+[https://github.com/wuspy/portal_calendar](https://github.com/wuspy/portal_calendar)
+
+kyleturman/home-dashboard — the "server renders the image, board just fetches and displays" architecture (see `ideas.md` idea 18)
+[https://github.com/kyleturman/home-dashboard](https://github.com/kyleturman/home-dashboard)
+
+SeBassTian23/ESP32-CalendarDisplay — same server-side-rendering split, calendar-focused
+[https://github.com/SeBassTian23/ESP32-CalendarDisplay](https://github.com/SeBassTian23/ESP32-CalendarDisplay)
+
+Hackaday's e-ink tag — the creative fringe, continuously updated (F1 race tracker, a ~60Hz-partial-refresh e-ink Game Boy, the LightInk solar watch that ran 9 months, an ESP32 PDA, Wi-Fi photo frames)
+[https://hackaday.com/tag/e-ink/](https://hackaday.com/tag/e-ink/)
+
+TRMNL — commercial-but-open e-ink dashboard (ESP32 + 7.5" panel): server composes the image, board fetches and sleeps for months; 375+ plugins, open firmware, self-hostable server (see `ideas.md` idea 9)
+[https://trmnl.com/](https://trmnl.com/) · firmware/server: [https://github.com/usetrmnl](https://github.com/usetrmnl)
+
+OpenEPaperLink — open firmware/protocol for electronic shelf labels: an ESP32 access point pushes images/weather/RSS/calendar to fleets of ~9µA battery e-ink price tags (see `ideas.md` idea 30)
+[https://github.com/OpenEPaperLink/OpenEPaperLink](https://github.com/OpenEPaperLink/OpenEPaperLink)
+
+Meshtastic supported devices — the off-grid LoRa mesh world where e-ink is the default display for battery reasons (Heltec Wireless Paper, Vision Master, etc. — see `ideas.md` idea 29)
+[https://meshtastic.org/docs/hardware/devices/](https://meshtastic.org/docs/hardware/devices/)
