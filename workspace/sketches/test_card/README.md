@@ -65,16 +65,16 @@ the repo root for install steps and more detail:
 
 ```bash
 # from the repo root
-arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" sketches/test_card/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/test_card/
+arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" workspace/sketches/test_card/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" workspace/sketches/test_card/
 ```
 
-Or, more simply, run `sketches/test_card/install.sh` (optionally passing a port,
+Or, more simply, run `workspace/sketches/test_card/install.sh` (optionally passing a port,
 defaulting to `/dev/ttyUSB0`) — it runs those same two commands, using its own
 hardcoded copy of the FQBN so it works even without `docs/fqbn.txt` present:
 
 ```bash
-./sketches/test_card/install.sh
+./workspace/sketches/test_card/install.sh
 ```
 
 Once flashed, the panel should show the built-in PM5544-style test card

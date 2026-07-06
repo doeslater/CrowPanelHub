@@ -120,7 +120,7 @@ separately talk to the *ESP32* over USB) — don't conflate the two USB connecti
 ### `arduino-cli`
 
 The command-line equivalent of the Arduino IDE GUI — installed and used here to compile
-`sketches/display_text/` and to compile/upload/test `sketches/test_card/` without ever opening the GUI,
+`workspace/sketches/display_text/` and to compile/upload/test `workspace/sketches/test_card/` without ever opening the GUI,
 confirming the board config in `docs/arduino-ide-setup.md` translates directly into `arduino-cli`
 flags.
 
@@ -138,34 +138,34 @@ arduino-cli config add board_manager.additional_urls https://raw.githubuserconte
 arduino-cli core update-index
 
 arduino-cli core install esp32:esp32          # ESP32 board package (see docs/reference.md) — ~1GB, several minutes
-arduino-cli lib install GxEPD2                # e-paper driver library used by sketches/display_text/ (pulls in Adafruit GFX + BusIO)
+arduino-cli lib install GxEPD2                # e-paper driver library used by workspace/sketches/display_text/ (pulls in Adafruit GFX + BusIO)
 
 arduino-cli board listall | grep -i esp32s3   # find the FQBN for "ESP32S3 Dev Module" -> esp32:esp32:esp32s3
 arduino-cli board details -b esp32:esp32:esp32s3   # list valid values for each --fqbn board-option (USBMode, PSRAM, etc.)
 
 # compile, matching the board options recorded in docs/arduino-ide-setup.md (works for any sketch):
-arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" sketches/display_text/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/test_card/   # actually flashed to real hardware, see below
+arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" workspace/sketches/display_text/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" workspace/sketches/test_card/   # actually flashed to real hardware, see below
 arduino-cli monitor -p /dev/ttyUSB0 -c baudrate=115200
 ```
 
 `docs/fqbn.txt` holds that exact board-option string, kept for manual use
 like the commands above. Each firmware folder also has its own `install.sh`
-(`./sketches/test_card/install.sh [port]`, etc.) that runs the two
+(`./workspace/sketches/test_card/install.sh [port]`, etc.) that runs the two
 commands above for you — those scripts hardcode their own copy of the FQBN
 rather than reading this file, so a sketch folder still works standalone if
 copied out of the repo (update all three copies if the FQBN ever changes).
 
 Confirmed working on this machine: the compile command above succeeds against the real
-`sketches/display_text/display_text.ino` (458,538 bytes / 34% program storage, 39,188 bytes / 11% dynamic
+`workspace/sketches/display_text/display_text.ino` (458,538 bytes / 34% program storage, 39,188 bytes / 11% dynamic
 memory). The four `--fqbn` board-option values (`hwcdc`, `default`, `opi`, `default`) were checked
 against `arduino-cli board details` first — worth doing since `arduino-cli compile` does reject an
 invalid option value outright (`Error during build: invalid value '...' for option '...'`), so a
 typo there fails loudly rather than silently compiling with the wrong setting.
 
-`upload` has also been exercised for real: `sketches/test_card/` was compiled and flashed to an
+`upload` has also been exercised for real: `workspace/sketches/test_card/` was compiled and flashed to an
 actual CrowPanel board on `/dev/ttyUSB0` with the same `--fqbn` string as above, and confirmed
-working via the serial round-trip described below. (`sketches/receive_image/`, the original
+working via the serial round-trip described below. (`workspace/sketches/receive_image/`, the original
 milestone-1 firmware — see `CLAUDE.md` — was verified the same way before it was removed from
 this repo for not being a clear teaching vehicle.)
 
@@ -185,7 +185,7 @@ If the printed identity doesn't match the sketch you think you're testing agains
 — not your script/payload — is almost certainly the bug. This cost a full debugging session once:
 a since-deleted, never-committed sketch (`test_screen.ino`, built outside this repo) was left
 flashed on the board, and its `setup()` blocked on a full e-paper refresh before entering `loop()`,
-silently truncating every incoming frame regardless of payload — `sketches/receive_image/`'s own
+silently truncating every incoming frame regardless of payload — `workspace/sketches/receive_image/`'s own
 already-verified test payload (that folder has since been removed from this repo) failed against
 it identically to the new one under investigation, which is what exposed it as a
 firmware-identity problem rather than a payload bug.
@@ -204,13 +204,13 @@ Group membership changes only apply to *new* login sessions, not the shell you r
 Rather than fully logging out, a subshell with the group applied immediately works too:
 
 ```bash
-sg dialout -c "arduino-cli upload -p /dev/ttyUSB0 --fqbn $(cat docs/fqbn.txt) sketches/test_card/"
+sg dialout -c "arduino-cli upload -p /dev/ttyUSB0 --fqbn $(cat docs/fqbn.txt) workspace/sketches/test_card/"
 ```
 
 ### Python (serial control, no extra install)
 
 There's no Android sender yet to actually produce a wire-protocol frame, so a small Python module
-(`sketches/test_card/serial_sender.py`) stands in for it during firmware bring-up — it resets the
+(`workspace/sketches/test_card/serial_sender.py`) stands in for it during firmware bring-up — it resets the
 board and sends a hand-built frame matching the protocol in `CLAUDE.md`, and every sending script in
 this repo (`send_checkerboard.py`, `generate_test_pattern.py`) imports its `send_payload()` rather
 than reimplementing this. `pip`/`pyserial` weren't available on this machine (`python3 -m pip` →
@@ -229,7 +229,7 @@ os.read(fd, 4096)                                         # read the board's Ser
 Run its checkerboard-sending companion directly once the board is flashed and plugged in:
 
 ```bash
-python3 sketches/test_card/send_checkerboard.py
+python3 workspace/sketches/test_card/send_checkerboard.py
 ```
 
 A useful adjacent trick: `esptool` (bundled with the ESP32 core, not on `PATH` by itself) can
@@ -240,7 +240,7 @@ without waiting through another upload:
 ~/.arduino15/packages/esp32/tools/esptool_py/5.3.0/esptool --chip esp32s3 --port /dev/ttyUSB0 run
 ```
 
-`sketches/test_card/generate_test_pattern.py --send` builds on the same idea but sends the full
+`workspace/sketches/test_card/generate_test_pattern.py --send` builds on the same idea but sends the full
 PM5544-style test card instead of a plain checkerboard — proof that `test_card.ino`'s
 wire-protocol path doesn't care what bitmap it's handed, since it just draws whatever 15,000-byte
 payload arrives. Unlike `serial_sender.py`/`send_checkerboard.py`, it isn't stdlib-only: it uses
@@ -248,7 +248,7 @@ Pillow (`PIL`) to build the card image. Pillow happened to already be installed 
 where it isn't, `pip install pillow` (or your distro's `python3-pillow` package) is needed first.
 
 ```bash
-python3 sketches/test_card/generate_test_pattern.py --send
+python3 workspace/sketches/test_card/generate_test_pattern.py --send
 ```
 
 ## Planned (not installed yet)
@@ -258,7 +258,7 @@ python3 sketches/test_card/generate_test_pattern.py --send
 The planned long-term firmware toolchain (see `CLAUDE.md`) — chosen over the Arduino IDE because
 it's scriptable and version-pins dependencies via `platformio.ini`, mirroring
 `gradle/libs.versions.toml` on the Android side. Not installed on this machine, and no
-`platformio.ini` exists in this repo yet (migrating `sketches/display_text/`, or writing the milestone-1
+`platformio.ini` exists in this repo yet (migrating `workspace/sketches/display_text/`, or writing the milestone-1
 sketch directly as a PlatformIO project, is still pending — see `CLAUDE.md` Open threads).
 
 ```bash

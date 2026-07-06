@@ -1,13 +1,14 @@
-# sketches/
+# workspace/sketches/
 
 Every ESP32 Arduino sketch for this project lives here, as sibling
-subfolders — a repo-root sibling of `app/` (the Android side). See
+subfolders — under `workspace/`, a repo-root sibling of `app/` (the Android
+side) that also holds the `exercises/` teaching curriculum. See
 `CLAUDE.md` (repo root) for the project-wide picture; this file stays
 narrowly focused on this folder.
 
 **New to ESP32/embedded development?** See
-[`docs/firmware-learning-path.md`](../docs/firmware-learning-path.md) for
-the current learning curriculum — it's now a hands-on `exercises/` track
+[`docs/firmware-learning-path.md`](../../docs/firmware-learning-path.md) for
+the current learning curriculum — it's now a hands-on `workspace/exercises/` track
 rather than a reading order across these sketches, since reading-only
 teaching didn't work (see `CLAUDE.md`'s "Teaching mode" section).
 
@@ -18,7 +19,7 @@ teaching didn't work (see `CLAUDE.md`'s "Teaching mode" section).
 | [`display_text/`](display_text/README.md) | Reference | A standalone reference sketch (not wired to anything) demonstrating GxEPD2 init/pin-mapping/power-cycle patterns. Deliberately kept as-is — consult it for patterns, don't evolve it. |
 | [`test_card/`](test_card/README.md) | Test tooling | Draws a built-in Philips PM5544-style test card on boot (no phone/PC needed), and also accepts wire-protocol frames over Serial afterwards. Hardware-verified. |
 
-`sketches/receive_image/`, the original milestone-1 firmware, was removed
+`workspace/sketches/receive_image/`, the original milestone-1 firmware, was removed
 — it wasn't a clear teaching vehicle. `test_card/` covers the same
 wire-protocol-frame-rendering role today.
 
@@ -33,7 +34,7 @@ Commands section for the story.
 ## Installing a sketch
 
 Each sketch folder has its own prerequisites, "Build and flash" section,
-and `install.sh` (`./sketches/<name>/install.sh [port]`, defaulting to
+and `install.sh` (`./workspace/sketches/<name>/install.sh [port]`, defaulting to
 `/dev/ttyUSB0`) — see that folder's README for the specifics. Both share
 one thing in common:
 
@@ -56,7 +57,7 @@ sketches moved here) leaves the old path's cache entry behind as orphaned
 clutter. Run it any time you want a guaranteed-clean rebuild:
 
 ```bash
-./sketches/clear-cache.sh
+./workspace/sketches/clear-cache.sh
 ```
 
 It clears the whole cache unconditionally rather than trying to detect

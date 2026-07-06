@@ -27,13 +27,13 @@ build/
 *.ap_
 *.dex
 
-# Python (firmware test/bring-up scripts under sketches/receive_image/, sketches/test_card/)
+# Python (firmware test/bring-up scripts under workspace/sketches/test_card/)
 __pycache__/
 *.pyc
 
-# Regenerable output of sketches/test_card/generate_test_pattern.py and render_preview.py
-/sketches/test_card/preview.png
-/sketches/test_card/boot_preview.png
+# Regenerable output of workspace/sketches/test_card/generate_test_pattern.py and render_preview.py
+/workspace/sketches/test_card/preview.png
+/workspace/sketches/test_card/boot_preview.png
 
 
 # macOS

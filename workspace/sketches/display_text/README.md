@@ -50,16 +50,16 @@ at the repo root for install steps and more detail:
 
 ```bash
 # from the repo root
-arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" sketches/display_text/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/display_text/
+arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" workspace/sketches/display_text/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" workspace/sketches/display_text/
 ```
 
-Or, more simply, run `sketches/display_text/install.sh` (optionally passing a port,
+Or, more simply, run `workspace/sketches/display_text/install.sh` (optionally passing a port,
 defaulting to `/dev/ttyUSB0`) — it runs those same two commands, using its own
 hardcoded copy of the FQBN so it works even without `docs/fqbn.txt` present:
 
 ```bash
-./sketches/display_text/install.sh
+./workspace/sketches/display_text/install.sh
 ```
 
 This sketch has been flashed to and verified against real hardware — the

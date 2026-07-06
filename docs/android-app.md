@@ -52,7 +52,7 @@ does.
 No diagramming tool (`graphviz`, `mermaid-cli`) is installed on the
 reference dev machine, and installing one needs a system package. So
 `generate_android_flowchart.py` hand-draws the diagram with Pillow instead
-— the same approach `sketches/test_card/generate_flowchart.py` uses.
+— the same approach `workspace/sketches/test_card/generate_flowchart.py` uses.
 Edit the script and rerun it if `MainViewModel.kt`/`UsbSerialTransport.kt`'s
 logic changes:
 

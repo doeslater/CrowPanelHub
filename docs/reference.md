@@ -20,12 +20,12 @@ Elecrow demo code (Arduino IDE)
 Elecrow GitHub (official)
 [https://github.com/Elecrow-RD/CrowPanel-ESP32-4.2-E-paper-HMI-Display-with-400-300](https://github.com/Elecrow-RD/CrowPanel-ESP32-4.2-E-paper-HMI-Display-with-400-300)
 
-papercodeIN/Elecrow — source of the `sketches/display_text/` reference sketch (`Wireless_Text_Display` project)
+papercodeIN/Elecrow — source of the `workspace/sketches/display_text/` reference sketch (`Wireless_Text_Display` project)
 [https://github.com/papercodeIN/Elecrow](https://github.com/papercodeIN/Elecrow)
 
 ## E-paper driver (GxEPD2 / SSD1683)
 
-GxEPD2 — Arduino display library for SPI e-paper displays (used by `sketches/display_text/display_text.ino`)
+GxEPD2 — Arduino display library for SPI e-paper displays (used by `workspace/sketches/display_text/display_text.ino`)
 [https://github.com/ZinggJM/GxEPD2](https://github.com/ZinggJM/GxEPD2)
 
 CrowPanel 4.2" E-Paper with GxEPD2 (Makerguides tutorial)
@@ -47,7 +47,7 @@ PlatformIO — planned firmware toolchain (not yet installed; see `CLAUDE.md`)
 
 ## Python libraries
 
-Pillow (PIL) — used by `sketches/test_card/generate_test_pattern.py`/`render_preview.py` to build the 400×300 test-card bitmaps sent to (or previewed for) the panel (see `docs/dev-tools.md`)
+Pillow (PIL) — used by `workspace/sketches/test_card/generate_test_pattern.py`/`render_preview.py` to build the 400×300 test-card bitmaps sent to (or previewed for) the panel (see `docs/dev-tools.md`)
 [https://pillow.readthedocs.io/](https://pillow.readthedocs.io/)
 
 ## Android libraries (in use)

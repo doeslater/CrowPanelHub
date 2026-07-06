@@ -7,11 +7,11 @@ get stuck) is defined once in `CLAUDE.md`'s "Teaching mode" section — read
 that alongside this file, not instead of it.
 
 This supersedes an earlier three-stage version of this doc that was built
-around `sketches/receive_image/` as its "Stage 2." That sketch has since
+around `workspace/sketches/receive_image/` as its "Stage 2." That sketch has since
 been removed (it wasn't a clear teaching vehicle), and the whole approach
 of teaching-by-reading-existing-code turned out not to work anyway — this
-version teaches by writing new code instead, in a separate `exercises/`
-directory. `exercises/PROGRESS.md` tracks which item below is current; read
+version teaches by writing new code instead, in a separate `workspace/exercises/`
+directory. `workspace/exercises/PROGRESS.md` tracks which item below is current; read
 it before assuming where you are, especially after a `/clear`.
 
 **Before starting**: you should be comfortable with basic programming
@@ -23,15 +23,15 @@ those commands yourself for every exercise.
 
 ## Prior art to consult (not exercises to redo)
 
-`sketches/` holds two existing, working sketches — read-only reference
+`workspace/sketches/` holds two existing, working sketches — read-only reference
 material, not something to reproduce by reading. They exist to show
 patterns you can consult mid-exercise if you get stuck on *how the library
 works*, as opposed to the conceptual hint your teaching session gives you:
 
-- **`sketches/display_text/display_text.ino`** — `GxEPD2` init, pin-mapping,
+- **`workspace/sketches/display_text/display_text.ino`** — `GxEPD2` init, pin-mapping,
   and the panel power-cycle pattern (`epdPower()`/`epd.init()`/
   `epd.hibernate()`) every other sketch in this repo reuses.
-- **`sketches/test_card/test_card.ino`** — the wire protocol (framing,
+- **`workspace/sketches/test_card/test_card.ino`** — the wire protocol (framing,
   checksums, little-endian packing) plus Floyd-Steinberg dithering.
 
 ## Warm-up — GPIO output
@@ -150,4 +150,4 @@ Android-side work resumes; see `ideas.md` directly for those.
 Once Phase A/B are solid, `CLAUDE.md`'s "Open threads" section (Wi-Fi/BLE
 transport work, error-state UX, a PlatformIO migration) describes what's
 genuinely unbuilt in the Android app and firmware toolchain, if you're
-looking for non-`exercises/` work to pair with what you've learned here.
+looking for non-`workspace/exercises/` work to pair with what you've learned here.
