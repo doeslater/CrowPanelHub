@@ -120,9 +120,9 @@ board.
 ### Via the Android app (phone does the heavy lifting)
 
 16. **Photo sender** — pick a gallery photo, resize + dither to 1-bit in
-    the app, send. Zero firmware changes (`receive_image.ino` draws
-    whatever bitmap arrives); completes the image-processing scope
-    milestone 1 explicitly deferred.
+    the app, send. Zero firmware changes (`test_card.ino` draws whatever
+    bitmap arrives over the wire protocol); completes the image-processing
+    scope milestone 1 explicitly deferred.
 17. **Fridge note / message board** — type text in the app, render, send.
     `TextBitmap.kt` is most of this already; it needs a text field instead
     of hardcoded demo text.

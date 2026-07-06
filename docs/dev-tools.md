@@ -120,7 +120,7 @@ separately talk to the *ESP32* over USB) — don't conflate the two USB connecti
 ### `arduino-cli`
 
 The command-line equivalent of the Arduino IDE GUI — installed and used here to compile
-`sketches/display_text/` and to compile/upload/test `sketches/receive_image/` without ever opening the GUI,
+`sketches/display_text/` and to compile/upload/test `sketches/test_card/` without ever opening the GUI,
 confirming the board config in `docs/arduino-ide-setup.md` translates directly into `arduino-cli`
 flags.
 
@@ -145,15 +145,16 @@ arduino-cli board details -b esp32:esp32:esp32s3   # list valid values for each 
 
 # compile, matching the board options recorded in docs/arduino-ide-setup.md (works for any sketch):
 arduino-cli compile --fqbn "$(cat docs/fqbn.txt)" sketches/display_text/
-arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/receive_image/   # actually flashed to real hardware, see below
+arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/test_card/   # actually flashed to real hardware, see below
 arduino-cli monitor -p /dev/ttyUSB0 -c baudrate=115200
 ```
 
-`docs/fqbn.txt` holds that exact board-option string as the single source of
-truth — every sketch folder's `README.md` and `install.sh` reads it the same
-way, rather than each hardcoding its own copy that could drift out of sync.
-Each firmware folder also has its own `install.sh` (`./sketches/receive_image/install.sh
-[port]`, etc.) that runs the two commands above for you.
+`docs/fqbn.txt` holds that exact board-option string, kept for manual use
+like the commands above. Each firmware folder also has its own `install.sh`
+(`./sketches/test_card/install.sh [port]`, etc.) that runs the two
+commands above for you — those scripts hardcode their own copy of the FQBN
+rather than reading this file, so a sketch folder still works standalone if
+copied out of the repo (update all three copies if the FQBN ever changes).
 
 Confirmed working on this machine: the compile command above succeeds against the real
 `sketches/display_text/display_text.ino` (458,538 bytes / 34% program storage, 39,188 bytes / 11% dynamic
@@ -162,16 +163,18 @@ against `arduino-cli board details` first — worth doing since `arduino-cli com
 invalid option value outright (`Error during build: invalid value '...' for option '...'`), so a
 typo there fails loudly rather than silently compiling with the wrong setting.
 
-`upload` has also been exercised for real: `sketches/receive_image/` (the milestone-1 firmware — see
-`CLAUDE.md`) was compiled and flashed to an actual CrowPanel board on `/dev/ttyUSB0` with the same
-`--fqbn` string as above, and confirmed working via the serial round-trip described below.
+`upload` has also been exercised for real: `sketches/test_card/` was compiled and flashed to an
+actual CrowPanel board on `/dev/ttyUSB0` with the same `--fqbn` string as above, and confirmed
+working via the serial round-trip described below. (`sketches/receive_image/`, the original
+milestone-1 firmware — see `CLAUDE.md` — was verified the same way before it was removed from
+this repo for not being a clear teaching vehicle.)
 
 **Confirm what's actually flashed before debugging.** The board only remembers the last thing
 uploaded to it — that can be a sketch from a different directory, a different session, or one
 that was never committed to this repo (`arduino-cli` caches every compiled sketch under
 `~/.cache/arduino/sketches/`, keyed by a hash of its source path, independent of git). Each sketch
-here prints a distinct line early in `setup()` (`receive_image.ino` prints
-`"Receive Image Controller Starting..."`), so the fastest way to check is to read boot output
+here prints a distinct line early in `setup()` (`test_card.ino` prints
+`"test_card ready, waiting for frames"`), so the fastest way to check is to read boot output
 right after a reset:
 
 ```bash
@@ -183,8 +186,9 @@ If the printed identity doesn't match the sketch you think you're testing agains
 a since-deleted, never-committed sketch (`test_screen.ino`, built outside this repo) was left
 flashed on the board, and its `setup()` blocked on a full e-paper refresh before entering `loop()`,
 silently truncating every incoming frame regardless of payload — `sketches/receive_image/`'s own
-already-verified test payload failed against it identically to the new one under investigation,
-which is what exposed it as a firmware-identity problem rather than a payload bug.
+already-verified test payload (that folder has since been removed from this repo) failed against
+it identically to the new one under investigation, which is what exposed it as a
+firmware-identity problem rather than a payload bug.
 
 ### Serial port permissions (Linux)
 
@@ -200,17 +204,18 @@ Group membership changes only apply to *new* login sessions, not the shell you r
 Rather than fully logging out, a subshell with the group applied immediately works too:
 
 ```bash
-sg dialout -c "arduino-cli upload -p /dev/ttyUSB0 --fqbn $(cat docs/fqbn.txt) sketches/receive_image/"
+sg dialout -c "arduino-cli upload -p /dev/ttyUSB0 --fqbn $(cat docs/fqbn.txt) sketches/test_card/"
 ```
 
 ### Python (serial control, no extra install)
 
-There's no Android sender yet to actually produce a wire-protocol frame, so a small Python script
-(`sketches/receive_image/send_test_frame.py`) stands in for it during firmware bring-up — it resets the
-board and sends a hand-built frame matching the protocol in `CLAUDE.md`. `pip`/`pyserial` weren't
-available on this machine (`python3 -m pip` → `No module named pip`, and installing it needs
-`sudo`/network access we didn't want to assume), so the script talks to the serial port using only
-the Python standard library:
+There's no Android sender yet to actually produce a wire-protocol frame, so a small Python module
+(`sketches/test_card/serial_sender.py`) stands in for it during firmware bring-up — it resets the
+board and sends a hand-built frame matching the protocol in `CLAUDE.md`, and every sending script in
+this repo (`send_checkerboard.py`, `generate_test_pattern.py`) imports its `send_payload()` rather
+than reimplementing this. `pip`/`pyserial` weren't available on this machine (`python3 -m pip` →
+`No module named pip`, and installing it needs `sudo`/network access we didn't want to assume), so
+it talks to the serial port using only the Python standard library:
 
 ```python
 import fcntl, os, termios
@@ -221,10 +226,10 @@ os.write(fd, frame_bytes)                                 # send a frame
 os.read(fd, 4096)                                         # read the board's Serial.println() responses
 ```
 
-Run it directly once the board is flashed and plugged in:
+Run its checkerboard-sending companion directly once the board is flashed and plugged in:
 
 ```bash
-python3 sketches/receive_image/send_test_frame.py
+python3 sketches/test_card/send_checkerboard.py
 ```
 
 A useful adjacent trick: `esptool` (bundled with the ESP32 core, not on `PATH` by itself) can
@@ -235,17 +240,15 @@ without waiting through another upload:
 ~/.arduino15/packages/esp32/tools/esptool_py/5.3.0/esptool --chip esp32s3 --port /dev/ttyUSB0 run
 ```
 
-`sketches/receive_image/send_text.py` builds on the same idea but sends rendered text instead of a
-checkerboard — proof that `receive_image.ino` doesn't need to change at all to display something
-different, since it just draws whatever 15,000-byte bitmap it's handed. Unlike
-`send_test_frame.py`, this one isn't stdlib-only: it uses Pillow (`PIL`) to rasterize text with
-real font metrics, since hand-rolling a bitmap font wasn't worth it for a test script. Pillow
-happened to already be installed on this machine; where it isn't, `pip install pillow` (or your
-distro's `python3-pillow` package) is needed first.
+`sketches/test_card/generate_test_pattern.py --send` builds on the same idea but sends the full
+PM5544-style test card instead of a plain checkerboard — proof that `test_card.ino`'s
+wire-protocol path doesn't care what bitmap it's handed, since it just draws whatever 15,000-byte
+payload arrives. Unlike `serial_sender.py`/`send_checkerboard.py`, it isn't stdlib-only: it uses
+Pillow (`PIL`) to build the card image. Pillow happened to already be installed on this machine;
+where it isn't, `pip install pillow` (or your distro's `python3-pillow` package) is needed first.
 
 ```bash
-python3 sketches/receive_image/send_text.py "Hello World" "from Python" "over USB serial"
-python3 sketches/receive_image/send_text.py                              # uses built-in default lines
+python3 sketches/test_card/generate_test_pattern.py --send
 ```
 
 ## Planned (not installed yet)

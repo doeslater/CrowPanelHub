@@ -47,7 +47,7 @@ PlatformIO — planned firmware toolchain (not yet installed; see `CLAUDE.md`)
 
 ## Python libraries
 
-Pillow (PIL) — used by `sketches/receive_image/send_text.py` to rasterize text into the 400×300 bitmap sent to the panel (see `docs/dev-tools.md`)
+Pillow (PIL) — used by `sketches/test_card/generate_test_pattern.py`/`render_preview.py` to build the 400×300 test-card bitmaps sent to (or previewed for) the panel (see `docs/dev-tools.md`)
 [https://pillow.readthedocs.io/](https://pillow.readthedocs.io/)
 
 ## Android libraries (in use)
