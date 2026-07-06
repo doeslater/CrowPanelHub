@@ -6,17 +6,21 @@ subfolders — a repo-root sibling of `app/` (the Android side). See
 narrowly focused on this folder.
 
 **New to ESP32/embedded development?** See
-[`docs/firmware-learning-path.md`](../docs/firmware-learning-path.md) for a
-suggested reading order across these three sketches, simplest concepts
-first.
+[`docs/firmware-learning-path.md`](../docs/firmware-learning-path.md) for
+the current learning curriculum — it's now a hands-on `exercises/` track
+rather than a reading order across these sketches, since reading-only
+teaching didn't work (see `CLAUDE.md`'s "Teaching mode" section).
 
 ## Sketches
 
 | Folder | Role | What it is |
 | --- | --- | --- |
 | [`display_text/`](display_text/README.md) | Reference | A standalone reference sketch (not wired to anything) demonstrating GxEPD2 init/pin-mapping/power-cycle patterns. Deliberately kept as-is — consult it for patterns, don't evolve it. |
-| [`receive_image/`](receive_image/README.md) | Active (milestone 1) | The milestone-1 firmware: listens on USB serial for one wire-protocol frame, validates it, and renders it with a full e-paper refresh. Hardware-verified. |
-| [`test_card/`](test_card/README.md) | Test tooling | A second, independent firmware: draws a built-in Philips PM5544-style test card on boot (no phone/PC needed), and also accepts the same wire-protocol frames `receive_image.ino` does. Hardware-verified. |
+| [`test_card/`](test_card/README.md) | Test tooling | Draws a built-in Philips PM5544-style test card on boot (no phone/PC needed), and also accepts wire-protocol frames over Serial afterwards. Hardware-verified. |
+
+`sketches/receive_image/`, the original milestone-1 firmware, was removed
+— it wasn't a clear teaching vehicle. `test_card/` covers the same
+wire-protocol-frame-rendering role today.
 
 **Only one sketch is ever flashed on the board at a time.** Don't assume
 which one is currently on a board you didn't just flash yourself — each
@@ -30,13 +34,14 @@ Commands section for the story.
 
 Each sketch folder has its own prerequisites, "Build and flash" section,
 and `install.sh` (`./sketches/<name>/install.sh [port]`, defaulting to
-`/dev/ttyUSB0`) — see that folder's README for the specifics. All three
-share one thing in common:
+`/dev/ttyUSB0`) — see that folder's README for the specifics. Both share
+one thing in common:
 
-- **`docs/fqbn.txt`** (repo root) is the single source of truth for the
-  FQBN board-option string every sketch is compiled/uploaded with — every
-  `README.md` and `install.sh` here reads that same file rather than each
-  hardcoding its own copy.
+- **`docs/fqbn.txt`** (repo root) holds the FQBN board-option string every
+  sketch is compiled/uploaded with, for manual/documentation use. Each
+  `install.sh` hardcodes its own copy of this same string rather than
+  reading the file, so a sketch folder still works if copied out of the
+  repo on its own — if the FQBN ever changes, update all three copies.
 - **`docs/dev-tools.md`** (repo root) covers the actual prerequisites in
   full — installing `arduino-cli`, the ESP32 board package, and the
   `GxEPD2` library, plus serial port permissions — rather than repeating
@@ -47,7 +52,7 @@ share one thing in common:
 **`clear-cache.sh`** clears `arduino-cli`'s compiled-sketch cache
 (`~/.cache/arduino/sketches/`), which is keyed by a hash of each sketch's
 source *path* — so moving/renaming a sketch folder (as happened when these
-three moved here) leaves the old path's cache entry behind as orphaned
+sketches moved here) leaves the old path's cache entry behind as orphaned
 clutter. Run it any time you want a guaranteed-clean rebuild:
 
 ```bash

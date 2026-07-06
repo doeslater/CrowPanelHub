@@ -4,7 +4,6 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-REPO_ROOT="$(dirname "$(dirname "$SCRIPT_DIR")")"
 PORT="${1:-/dev/ttyUSB0}"
 
 if ! command -v arduino-cli >/dev/null 2>&1; then
@@ -12,7 +11,11 @@ if ! command -v arduino-cli >/dev/null 2>&1; then
   exit 1
 fi
 
-FQBN="$(cat "$REPO_ROOT/docs/fqbn.txt")"
+# Same board for every sketch in this repo. Hardcoded here (not read from a
+# shared file) so this script still works if this folder is ever copied out
+# on its own, without the rest of the repo alongside it -- see docs/fqbn.txt
+# for the same value kept for manual/documentation use.
+FQBN="esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=default,PSRAM=opi,PartitionScheme=default"
 
 echo "--- compiling $(basename "$SCRIPT_DIR") ---"
 arduino-cli compile --fqbn "$FQBN" "$SCRIPT_DIR"

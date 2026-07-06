@@ -11,8 +11,8 @@ no serial receive loop, no wire protocol, nothing wired to a phone or PC.
 **This folder is a deliberate reference example, not a spike to evolve.**
 It's kept here to show working GxEPD2 init/pin-mapping/power-cycle
 patterns — see `CLAUDE.md` (repo root) for the project-wide picture. It
-predates this repo's wire-protocol firmware (`sketches/receive_image/`, `sketches/test_card/`)
-and isn't meant to grow into them; consult it for patterns when writing new
+predates this repo's wire-protocol firmware (`sketches/test_card/`) and
+isn't meant to grow into it; consult it for patterns when writing new
 sketches, rather than editing it in place.
 
 ## Files
@@ -20,7 +20,7 @@ sketches, rather than editing it in place.
 | File | What it is |
 | --- | --- |
 | `display_text.ino` | The sketch itself — see the walkthrough below. |
-| `install.sh` | Compiles and uploads this sketch (`./install.sh [port]`) — reads the shared `docs/fqbn.txt`, see "Build and flash" below. |
+| `install.sh` | Compiles and uploads this sketch (`./install.sh [port]`) — has its own hardcoded FQBN, see "Build and flash" below. |
 | `config.h` | Display size/margin, `GxEPD2` init parameters, font-size and row-height constants. |
 
 ## Prerequisites
@@ -55,8 +55,8 @@ arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/displa
 ```
 
 Or, more simply, run `sketches/display_text/install.sh` (optionally passing a port,
-defaulting to `/dev/ttyUSB0`) — it runs those same two commands, reading the
-same `docs/fqbn.txt`:
+defaulting to `/dev/ttyUSB0`) — it runs those same two commands, using its own
+hardcoded copy of the FQBN so it works even without `docs/fqbn.txt` present:
 
 ```bash
 ./sketches/display_text/install.sh
@@ -81,7 +81,7 @@ finishes drawing, `Setup completed successfully`.
 - **`DisplaySettings`/`Row`** model up to 8 text rows, each with its own
   font size, plus whole-display `border`/`invertColors` flags.
 - **`epdPower()`** toggles the panel's `PWR` pin — the same power-cycle
-  pattern `receive_image.ino`/`test_card.ino` reuse.
+  pattern `test_card.ino` reuses.
 - **`epdInit()`** calls `epd.init(...)` with the parameters from
   `config.h`, sets rotation/text color/full-window mode.
 - **`setFontSize()`/`getRowHeight()`** map the three font-size constants

@@ -1,14 +1,17 @@
 # sketches/test_card/
 
 **Role: test tooling.** Independent boot self-test plus wire-protocol
-receiver, not a replacement for `receive_image`.
+receiver.
 
-A second, independent firmware for this board — a sibling of
-`sketches/receive_image/receive_image.ino`, not a replacement for it. It draws a
-Philips PM5544-style broadcast test card (checkered border, dithered
-gray-grid background, five-band circle) directly on boot, no phone or PC
-needed, and also accepts wire-protocol frames over Serial afterwards, same
-as `receive_image.ino`.
+A second, independent firmware for this board (alongside `display_text/`).
+It draws a Philips PM5544-style broadcast test card (checkered border,
+dithered gray-grid background, five-band circle) directly on boot, no
+phone or PC needed, and also accepts wire-protocol frames over Serial
+afterwards. It was originally built as a sibling of
+`sketches/receive_image/receive_image.ino` (since removed — it wasn't a
+clear teaching vehicle) with the same wire-protocol handling, plus its own
+boot-time test card on top; today it's the only sketch here that
+implements the wire protocol.
 
 See `CLAUDE.md` (repo root) for the project-wide picture. This file stays
 narrowly focused on *this folder's* code.
@@ -24,9 +27,11 @@ see `CLAUDE.md`'s Commands section for the full story.
 | File | What it is |
 | --- | --- |
 | `test_card.ino` | The firmware itself — see the walkthrough below. |
-| `install.sh` | Compiles and uploads this sketch (`./install.sh [port]`) — reads the shared `docs/fqbn.txt`, see "Build and flash" below. |
-| `config.h` | Pin numbers, display size, and wire-protocol constants — identical protocol to `sketches/receive_image/config.h`, kept as its own copy per this repo's convention of self-contained sketch folders. Also the single source of truth for these constants on the Python side — see `config_h.py`. |
+| `install.sh` | Compiles and uploads this sketch (`./install.sh [port]`) — has its own hardcoded FQBN, see "Build and flash" below. |
+| `config.h` | Pin numbers, display size, and the wire-protocol constants described in `CLAUDE.md`, kept as its own copy per this repo's convention of self-contained sketch folders. Also the single source of truth for these constants on the Python side — see `config_h.py`. |
 | `config_h.py` | Parses `config.h` so `generate_test_pattern.py`/`render_preview.py` don't hardcode a value `config.h` already defines. |
+| `serial_sender.py` | Stdlib-only helpers (board reset via DTR/RTS, frame building) imported by `generate_test_pattern.py`/`send_checkerboard.py`, not run directly — its own copy per this repo's self-contained-sketch-folder convention (same reasoning as `config.h` above). |
+| `send_checkerboard.py` | Sends a plain checkerboard test frame, the simplest smoke test. |
 | `generate_test_pattern.py` | Builds the same PM5544-style card as a full-canvas (no reserved label strip) payload and sends it to the board over the wire protocol — see "Sending a test frame" below. |
 | `render_preview.py` | Renders a PNG (`boot_preview.png`) of exactly what `test_card.ino`'s own boot self-test draws, without needing hardware — see "Previewing without hardware" below. |
 | `CompletePattern.jpg` | Reference photo of a real PM5544 card, used to measure `generate_test_pattern.py`'s band proportions. |
@@ -36,8 +41,8 @@ see `CLAUDE.md`'s Commands section for the full story.
 
 ## Prerequisites
 
-Same as `sketches/receive_image/` (see `docs/dev-tools.md`'s `arduino-cli` section
-for the actual install commands):
+The same `arduino-cli` prerequisites as every sketch in this repo (see
+`docs/dev-tools.md`'s `arduino-cli` section for the actual install commands):
 
 - `arduino-cli` installed and on `PATH`
 - The ESP32 board package installed (`arduino-cli core install esp32:esp32`),
@@ -55,8 +60,8 @@ for the actual install commands):
 
 ## Build and flash
 
-Same toolchain as `sketches/receive_image/` — see `docs/dev-tools.md` at the repo
-root for install steps and more detail:
+Same toolchain as every sketch in this repo — see `docs/dev-tools.md` at
+the repo root for install steps and more detail:
 
 ```bash
 # from the repo root
@@ -65,8 +70,8 @@ arduino-cli upload -p /dev/ttyUSB0 --fqbn "$(cat docs/fqbn.txt)" sketches/test_c
 ```
 
 Or, more simply, run `sketches/test_card/install.sh` (optionally passing a port,
-defaulting to `/dev/ttyUSB0`) — it runs those same two commands, reading the
-same `docs/fqbn.txt`:
+defaulting to `/dev/ttyUSB0`) — it runs those same two commands, using its own
+hardcoded copy of the FQBN so it works even without `docs/fqbn.txt` present:
 
 ```bash
 ./sketches/test_card/install.sh
@@ -81,8 +86,13 @@ then reset the board):
 
 | Sketch | Boot line |
 | --- | --- |
-| `receive_image.ino` | `Receive Image Controller Starting...` |
 | `test_card.ino` | `test_card ready, waiting for frames` |
+| `display_text.ino` | `Display Controller Starting...` |
+
+If a board instead prints `Receive Image Controller Starting...`, it's
+still running an old build of `receive_image.ino` from before that sketch
+was removed from this repo — firmware persists on a board independent of
+what's in git (see `CLAUDE.md`'s "confirm what's actually flashed" note).
 
 ## Running the self-test
 
@@ -114,11 +124,11 @@ don't need pixel-identical layouts:
 python3 sketches/test_card/generate_test_pattern.py --send
 ```
 
-`sketches/receive_image/send_test_frame.py` also still works if you just want a
+This folder's own `send_checkerboard.py` also works if you just want a
 plain checkerboard instead:
 
 ```bash
-python3 sketches/receive_image/send_test_frame.py
+python3 sketches/test_card/send_checkerboard.py
 ```
 
 A real send should end with this sketch printing `frame ok, <label>`, and
@@ -147,10 +157,10 @@ images and would otherwise silently overwrite each other.
 
 Read this alongside `test_card.ino` — the inline comments there go into
 more depth on individual pieces than the diagram does. The wire-protocol
-half (`receiveFrame()`/`loop()`/`renderPayload()`) follows the same
-structure as `sketches/receive_image/receive_image.ino`'s `handleFrame()`/`loop()`
-— see that folder's README for a walkthrough of that part. What's unique
-to this sketch is how it builds its boot pattern:
+half (`receiveFrame()`/`loop()`/`renderPayload()`) implements the protocol
+described in `CLAUDE.md`: magic byte, length, timestamp, payload,
+checksum, in that order, with no reply ever sent. What's unique to this
+sketch is how it builds its boot pattern:
 
 - **`computeBandBounds()`** works out the five circle bands' y-ranges once
   at boot (`BAND_FRACTIONS`, rounded, with the last band absorbing any
@@ -179,9 +189,11 @@ to this sketch is how it builds its boot pattern:
 
 ## Regenerating the flowchart
 
-Same approach as `sketches/receive_image/generate_flowchart.py` (hand-drawn with
-Pillow — see that script's docstring for why no `graphviz`/`mermaid-cli` is
-used). Edit the script and rerun it if `test_card.ino`'s logic changes:
+Hand-drawn with Pillow rather than `graphviz`/`mermaid-cli`, since neither
+is installed on the reference dev machine and installing one needs a
+system package (`docs/android-app.md`'s flowchart uses the same approach,
+for the same reason). Edit the script and rerun it if `test_card.ino`'s
+logic changes:
 
 ```bash
 python3 sketches/test_card/generate_flowchart.py   # from the repo root

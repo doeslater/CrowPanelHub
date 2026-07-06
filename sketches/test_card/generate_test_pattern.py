@@ -3,12 +3,14 @@ Recreates (in code, not by loading a reference photo) the classic Philips
 PM5544-style B/W test card -- checkered border, gray grid background, and a
 center circle divided into the five bands a real test card uses to check
 geometry, bandwidth/resolution, and grayscale tracking -- as a 400x300
-monochrome bitmap, sent to the already-flashed receive_image.ino firmware over
-serial. No firmware change is needed for this -- receive_image.ino only ever
-draws whatever bitmap it's given (and stamps the "last updated" timestamp
-itself), so this is the test-card equivalent of the checkerboard pattern in
-sketches/receive_image/send_test_frame.py: same wire protocol, same board, different
-payload.
+monochrome bitmap, sent over serial to whichever sketch in this repo is
+currently flashed and implements the wire protocol (receive_image.ino,
+test_card.ino). No firmware change is needed for this -- both sketches only
+ever draw whatever bitmap they're given (and stamp the "last updated"
+timestamp themselves), so this is the test-card equivalent of the
+checkerboard pattern in this folder's own send_checkerboard.py (a vendored
+copy of receive_image/send_checkerboard.py -- see serial_sender.py for why):
+same wire protocol, same board, different payload.
 
 Band proportions and the border/grid cell size were measured from
 CompletePattern.jpg (a reference photo of the real card, kept alongside this
@@ -29,14 +31,11 @@ Requires Pillow (`pip install pillow`).
 import argparse
 import datetime
 import os
-import sys
 
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "receive_image"))
-from send_test_frame import send_payload  # noqa: E402
-
-from config_h import DISPLAY_HEIGHT, DISPLAY_WIDTH, PAYLOAD_SIZE  # noqa: E402
+from config_h import DISPLAY_HEIGHT, DISPLAY_WIDTH, PAYLOAD_SIZE
+from serial_sender import send_payload
 
 PREVIEW_PATH = os.path.join(os.path.dirname(__file__), "preview.png")
 
