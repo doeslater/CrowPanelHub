@@ -28,6 +28,15 @@ papercodeIN/Elecrow — source of the `workspace/sketches/display_text/` referen
 GxEPD2 — Arduino display library for SPI e-paper displays (used by `workspace/sketches/display_text/display_text.ino`)
 [https://github.com/ZinggJM/GxEPD2](https://github.com/ZinggJM/GxEPD2)
 
+GxEPD2 — ConnectingHardware.md (official pin-mapping guide, incl. CS/DC/RES/BUSY wiring and 3.3V/5V level-shifting warnings)
+[https://github.com/ZinggJM/GxEPD2/blob/master/ConnectingHardware.md](https://github.com/ZinggJM/GxEPD2/blob/master/ConnectingHardware.md)
+
+GxEPD2 — GitHub Discussions (official support venue; replaced the now-closed Arduino Forum threads)
+[https://github.com/ZinggJM/GxEPD2/discussions](https://github.com/ZinggJM/GxEPD2/discussions)
+
+Adafruit_GFX — the graphics/text base class GxEPD2 extends (`setCursor()`/`setFont()`/`print()`/`fillScreen()` etc. all come from here, not GxEPD2 itself)
+[https://learn.adafruit.com/adafruit-gfx-graphics-library](https://learn.adafruit.com/adafruit-gfx-graphics-library) · repo: [https://github.com/adafruit/Adafruit-GFX-Library](https://github.com/adafruit/Adafruit-GFX-Library)
+
 CrowPanel 4.2" E-Paper with GxEPD2 (Makerguides tutorial)
 [https://www.makerguides.com/crowpanel-4-2-inch-e-paper-with-gxepd2/](https://www.makerguides.com/crowpanel-4-2-inch-e-paper-with-gxepd2/)
 
