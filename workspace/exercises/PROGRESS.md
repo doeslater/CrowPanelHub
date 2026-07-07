@@ -8,9 +8,16 @@ especially at the start of a session after a `/clear` — see `CLAUDE.md`'s
 ## Current
 
 **Idea 2 — Generative art frame** (see `docs/firmware-learning-path.md`,
-Phase A #2) — not yet started. Algorithmic pattern generation on boot
-(maze, cellular automaton, plotter-style lines), reusing `test_card.ino`'s
-dithering approach for any grayscale effect.
+Phase A #2) — theory given, checkpoint in progress, not yet called done.
+Scaffolded `workspace/exercises/generative_art/` (`install.sh`, `task.md`
+incl. screen-coordinate reference). Current `generative_art.ino`: a
+hand-placed fixed icon (rect/circles/triangle/sparkle) plus a `for` loop
+of 30 `random()`-positioned lines regenerated each boot — hardware-verified
+that the lines actually vary run to run. Open question posed to user (not
+yet answered): whether this fixed-icon + generative-lines mix counts as
+"the pattern," or whether to push further into a fully algorithmic piece
+(maze / cellular automaton / more complete line art) before calling this
+checkpoint passed.
 
 ## Log
 
@@ -47,3 +54,26 @@ dithering approach for any grayscale effect.
   restored both themselves. Verified against real hardware, badge renders
   correctly with the panel fully unpowered afterward — passed, one hint
   given (pointed at the missing `init()`/power sequence, not the exact fix).
+
+- 2026-07-07 — Idea 2 (Generative art frame) theory given: per-pixel
+  drawing (`epd.drawPixel`) vs. shape/text primitives, and Floyd-Steinberg
+  dithering (reusing `test_card.ino`'s approach) for algorithms that
+  produce grayscale rather than pure black/white. Presented three example
+  algorithms (maze, cellular automaton, plotter-style lines) and asked
+  user to pick one. Scaffolded `workspace/exercises/generative_art/`
+  (`install.sh`, empty `.ino`, `task.md` incl. screen-coordinate reference).
+
+- 2026-07-07 — Idea 2 checkpoint attempt: user first wrote a hand-composed
+  fixed icon (not algorithmic — flagged this against the checkpoint's
+  actual intent), then added `random()`-positioned lines seeded via
+  `randomSeed(analogRead(A0))`. Bug: lines weren't actually varying
+  between boots. User debugged it themselves after being pointed at
+  printing the seed value and told ESP32-S3 has a real hardware RNG
+  worth looking into — traced it to an earlier `randomSeed(micros())`
+  call being immediately overwritten by the `analogRead(A0)` one, and
+  that `analogRead(A0)` wasn't producing a useful varying value. Fix:
+  dropped the `analogRead(A0)` line, kept `randomSeed(micros())` —
+  hardware-verified lines now differ each boot. Also refactored 13
+  repeated `drawLine()` calls into a `for` loop — good cleanup, unprompted.
+  Session ended before deciding whether the fixed-icon + generative-lines
+  mix counts as the checkpoint answer or needs to go further (see Current).
