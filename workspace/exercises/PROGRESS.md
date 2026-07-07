@@ -13,6 +13,12 @@ Phase A #1) — not yet started.
 ## Log
 
 - 2026-07-06 — Warm-up, GPIO output via `PWR`: wrote/compiled/uploaded
-  `workspace/exercises/pwr_pin/pwr_pin.ino` (toggles GPIO 7 HIGH/LOW on a 1s timer,
+  `/workspace/basic_board/pwr_pin/pwr_pin.ino` (toggles GPIO 7 HIGH/LOW on a 1s timer,
   `Serial.println`s each transition), verified against real hardware via
   `arduino-cli monitor` — passed, no hint needed.
+
+- 2026-07-06 — Implement RGB LED color cycling for ESP32-S3: wrote/compiled/uploaded
+  `/workspace/basic_board/rgb_led/rgb_led.ino` (toggles GPIO 7 HIGH/LOW on a 1s timer,
+  `Serial.println`s each transition). (not added to the warmup_theory.md)
+
+- 2026-07-07 — moved code that runs on the barebones ESP32-S3 to the `basic_board` folder.
