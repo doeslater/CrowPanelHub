@@ -36,9 +36,9 @@ Same as the other firmware in this repo (see `docs/dev-tools.md`'s
 - The `GxEPD2` library installed (`arduino-cli lib install GxEPD2`, which
   pulls in Adafruit GFX + BusIO automatically — that's also where this
   sketch's bundled fonts, e.g. `FreeMonoBold24pt7b.h`, come from)
-- The board connected over USB and visible as a serial port (e.g.
-  `/dev/ttyUSB0` on Linux, via its CH340 USB-serial bridge — confirm with
-  `lsusb`/`arduino-cli board list`)
+- The CrowPanel connected over USB and visible as a serial port (see
+  `HARDWARE.md` for its confirmed bridge-chip/MAC identity and port on this
+  machine; confirm yours with `lsusb`/`arduino-cli board list`)
 - On Linux, your user in the `dialout` group — if `upload` fails with a
   permissions error, see `docs/dev-tools.md`'s "Serial port permissions"
   section

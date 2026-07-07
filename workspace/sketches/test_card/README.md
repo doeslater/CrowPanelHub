@@ -51,9 +51,9 @@ The same `arduino-cli` prerequisites as every sketch in this repo (see
   find it
 - The `GxEPD2` library installed (`arduino-cli lib install GxEPD2`, which
   pulls in Adafruit GFX + BusIO automatically)
-- The board connected over USB and visible as a serial port (e.g.
-  `/dev/ttyUSB0` on Linux, via its CH340 USB-serial bridge — confirm with
-  `lsusb`/`arduino-cli board list`)
+- The CrowPanel connected over USB and visible as a serial port (see
+  `HARDWARE.md` for its confirmed bridge-chip/MAC identity and port on this
+  machine; confirm yours with `lsusb`/`arduino-cli board list`)
 - On Linux, your user in the `dialout` group — if `upload` fails with a
   permissions error, see `docs/dev-tools.md`'s "Serial port permissions"
   section

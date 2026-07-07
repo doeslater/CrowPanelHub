@@ -34,14 +34,15 @@ A `MEMORY.md` file at the repo root (gitignored, local-only — not on GitHub) h
 
 ## Hardware target
 
-### Primary board: CrowPanel ESP32 4.2" E-Paper HMI Display
-- **Primary board**: CrowPanel ESP32 4.2" E-Paper HMI Display, SKU DIE07300S (Elecrow), ESP32-S3-WROOM-1-N8R8.
+See `HARDWARE.md` (repo root, gitignored/local-only) for canonical device names, MAC addresses, and port/bridge-chip identity — this section covers firmware-role and architecture context only, not device identity.
+
+### CrowPanel
 - **Panel**: 400×300, black/white only, driven by SPI, SSD1683 controller.
 - **Firmware ecosystem**: Arduino-based; Elecrow ships demo/example sketches, and the GxEPD2 library is the common driver for this panel (see Sources). The existing `workspace/sketches/display_text/` sketch uses `GxEPD2_BW<GxEPD2_420_GYE042A87, ...>` from that library.
 - **Firmware lives in this repo**: ESP32 firmware is authored as a subproject alongside `app/`, under `workspace/sketches/`. `workspace/` is a repo-root sibling of `app/` holding firmware sketches and the `workspace/exercises/` teaching curriculum together (kept separate from `app/` for tidiness, since this is fundamentally an Android project with firmware as a secondary concern), with each sketch as its own subfolder under `workspace/sketches/` (e.g. `workspace/sketches/display_text/`) — not nested inside the Android module.
 
-### Secondary board: ESP32-S3 barebones board
-Used for firmware sketches in [workspace/basic_board](workspace/basic_board), especially [workspace/basic_board/pwr_pin](workspace/basic_board/pwr_pin) and [workspace/basic_board/rgb_led](workspace/basic_board/rgb_led). This is a teaching companion to the CrowPanel board, not a replacement for it. Specs: ESP32 S3-N16R8 Development Board - Serial with two USB Type-C.
+### basic board
+Used for firmware sketches in [workspace/basic_board](workspace/basic_board), especially [workspace/basic_board/pwr_pin](workspace/basic_board/pwr_pin) and [workspace/basic_board/rgb_led](workspace/basic_board/rgb_led). This is a teaching companion to the CrowPanel board, not a replacement for it.
 
 
 ## Current milestone

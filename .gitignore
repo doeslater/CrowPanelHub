@@ -49,3 +49,5 @@ __pycache__/
 .claude
 # Local-only planning notes (kept on disk, not published)
 /MEMORY.md
+# Local-only hardware identity notes (kept on disk, not published)
+/HARDWARE.md
