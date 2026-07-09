@@ -47,6 +47,8 @@ __pycache__/
 /lint/reports/
 
 .claude
+# Real WiFi credentials in plain text (share wifi_config.h.example instead)
+/workspace/basic_board/morse/wifi_config.h
 # Local-only planning notes (kept on disk, not published)
 /MEMORY.md
 # Local-only hardware identity notes (kept on disk, not published)

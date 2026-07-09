@@ -1,0 +1,9 @@
+{
+  "fqbn": "esp32:esp32:esp32s3:USBMode=hwcdc,CDCOnBoot=default,PSRAM=opi,PartitionScheme=default",
+  "port": "/dev/ttyUSB0",
+  "monitorBaud": 115200,
+  "activeSketch": "crowpanel_list_hardware.ino",
+  "comments": true,
+  "tipVerbosity": "balanced",
+  "learningNotes": true
+}
