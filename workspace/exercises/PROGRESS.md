@@ -7,11 +7,10 @@ especially at the start of a session after a `/clear` — see `CLAUDE.md`'s
 
 ## Current
 
-**Idea 12 — On-device info screen** (see `docs/firmware-learning-path.md`,
-Phase A #3) — theory given (GPIO input/pull-ups/active-low reads on MENU,
-`__DATE__`/`__TIME__` build macros, `ESP.getFreeHeap()`), checkpoint not
-yet attempted. First GPIO *input* exercise (a MENU button press showing
-the running sketch's name/build timestamp/free heap).
+**Idea 10 — Menu/carousel** (see `docs/firmware-learning-path.md`,
+Phase A #4) — not yet started, theory not yet given. Same button-reading
+idea as Idea 12 just passed, but debouncing correctness actually matters
+this time (rotary + MENU/EXIT cycling between stored screens).
 
 ## Log
 
@@ -100,3 +99,11 @@ the running sketch's name/build timestamp/free heap).
   already-scanned North/West neighbor — no `visited` array, no stack, no
   recursion) requested as the simplest/shortest correct alternative to the
   recursive backtracker.
+
+- 2026-07-10 — Idea 12 (On-device info screen) checkpoint: wrote
+  `workspace/exercises/info_screen/info_screen.ino` — a debounced MENU
+  press (edge-detected, cooldown-timed) triggers the power/init/draw/
+  display/hibernate/power-off bracket, drawing the sketch name, build
+  timestamp (`__DATE__`/`__TIME__`), and free heap (`ESP.getFreeHeap()`).
+  Hardware-verified. One hint given, pointed at the power/init lifecycle
+  around the redraw. Checkpoint passed.
