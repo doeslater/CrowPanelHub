@@ -8,9 +8,10 @@ especially at the start of a session after a `/clear` — see `CLAUDE.md`'s
 ## Current
 
 **Idea 12 — On-device info screen** (see `docs/firmware-learning-path.md`,
-Phase A #3) — not yet started, no theory given yet. First GPIO *input*
-exercise (a MENU button press showing the running sketch's name/build
-timestamp/free heap).
+Phase A #3) — theory given (GPIO input/pull-ups/active-low reads on MENU,
+`__DATE__`/`__TIME__` build macros, `ESP.getFreeHeap()`), checkpoint not
+yet attempted. First GPIO *input* exercise (a MENU button press showing
+the running sketch's name/build timestamp/free heap).
 
 ## Log
 
