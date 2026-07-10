@@ -52,6 +52,8 @@ Used for firmware sketches in [workspace/basic_board](workspace/basic_board), es
 
 **Milestone 1**: send a bitmap from the phone to the ESP32 over USB serial and see it render on the panel, using a full (not partial) e-paper refresh. This is fire-and-forget: the ESP32 does not send anything back, and Android considers the send successful once the bytes are written to the serial port. Visual confirmation is by looking at the panel during bring-up. **Done, on both sides, and hardware-verified**: the receiving firmware (originally `workspace/sketches/receive_image/`, since removed — it wasn't a clear teaching vehicle, see Architecture below) received/verified/rendered the wire-protocol frame; `workspace/sketches/test_card/test_card.ino` implements the same wire protocol today and remains hardware-verified doing so. The Android app connects over USB serial and can send either a programmatically-generated checkerboard (`Checkerboard.kt` — a small loop building packed 1-bit bytes, no bundled binary asset, so the code stays readable/teachable) or rendered demo text (`TextBitmap.kt`, drawn via Android's `Canvas`/`Paint`), via two separate buttons — "Send Text" and "Send Checkerboard" — rather than the single "Send (test pattern)" button originally planned (see Architecture below for why both were kept). Both patterns have been confirmed rendering correctly on a real CrowPanel board.
 
+**Known issue, fix planned but not yet built**: intermittent USB send failures were diagnosed on 2026-07-10, traced to two independent causes — a flaky phone-side USB-C OTG adapter/cable causing the link to drop mid-write, and (separately, on that occasion) the board running a `workspace/exercises/` teaching sketch instead of `test_card.ino`. A full agreed fix (Android-side retry/reconnect, reusing `test_card.ino`'s existing text output as an ack, a board-reset button, real-time status UI) is written up in `docs/usb-reliability-fix-plan.md` but has not been implemented — don't assume the send flow is fully robust just because milestone 1 is marked done above.
+
 USB serial was chosen to start (over Wi-Fi/BLE) because it needs no pairing/provisioning UI, giving the tightest feedback loop while the ESP32-side rendering path is still being proven out.
 
 ## Transport & wire protocol
@@ -76,6 +78,7 @@ USB serial was chosen to start (over Wi-Fi/BLE) because it needs no pairing/prov
 
 - Error-state UX for USB permission denial.
 - Migrating firmware to a PlatformIO project structure (`platformio.ini` + `src/`) instead of a bare `.ino`.
+- "Reset and restore" as an actual in-app reflash (the app pushing known-good firmware onto the board over USB, not just the soft DTR/RTS reboot in `docs/usb-reliability-fix-plan.md`). Raised 2026-07-10 as a bigger future idea, explicitly deferred — would mean building an ESP32 flashing protocol into the Kotlin app (a substantial project on its own), not something to fold into the reliability fix above.
 
 ## Commands
 
