@@ -1,8 +1,9 @@
-# USB send reliability fix — agreed plan (not yet built)
+# USB send reliability fix — agreed plan (implemented, hardware-verified)
 
-Status: **planned, not implemented**. Estimated at ~3-4 hours of work; user wants a
-dedicated ~5-hour slot before starting. This doc is the durable record of what was
-diagnosed and agreed, so the work can resume cold.
+Status: **implemented and hardware-verified, 2026-07-11**. Originally estimated at
+~3-4 hours of work. This doc remains the durable record of what was diagnosed and
+agreed; see "Verification" at the bottom for what building it actually confirmed
+(including one bug the original plan didn't anticipate).
 
 ## What's broken (diagnosed 2026-07-10)
 
@@ -140,8 +141,33 @@ everything else.
 
 **Total: ~3-4 hours** of coding + hands-on hardware testing.
 
-## Note for whoever resumes this
+## Verification (2026-07-11)
 
-Before starting, confirm what's actually flashed on the board right now (see
-`CLAUDE.md`'s "confirm what's actually flashed" note) — don't assume it's
-still `info_screen.ino` or still `test_card.ino` from this session.
+Hardware-verified end to end over the real phone-to-board USB-OTG link (Pixel 6 ->
+CrowPanel):
+
+- **Clean send**: Diagnostics log showed `Sending frame (attempt 1/3)...` ->
+  `Frame written, awaiting ack...` -> the board's own `frame ok, Last updated: ...`
+  line, with the main screen showing `Confirmed: frame ok`. Confirmed twice back to
+  back, with no misread even right after a board reset.
+- **Wrong firmware**: flashing `info_screen.ino` (which never reads `Serial`)
+  instead of `test_card.ino` correctly produced `Board didn't confirm -- it may be
+  running different firmware` on the main screen, not a hang.
+- **Reset Board**: confirmed rebooting the board via the Diagnostics log's
+  `Resetting board...` -> `Board reset` pair.
+
+**One bug found and fixed during verification, not anticipated in the original
+plan above**: `readAckLine()` initially returned whatever line it read first. After
+several Reset Board taps in a row, a send picked up a stray leftover ROM boot-banner
+line and reported it as `"Unexpected response"` instead of continuing to wait for
+the real ack. Fixed by having `readAckLine()` discard any line that isn't a
+`"frame ok"`/`"frame dropped"` match and keep reading until one shows up or the
+deadline expires.
+
+**Not deliberately exercised**: the reconnect-on-write-failure path itself (forcing
+a mid-write cable pull specifically, to distinguish it from a plain ack timeout) —
+worth forcing if this ever needs re-confirming.
+
+Before resuming any further work here, confirm what's actually flashed on the board
+right now (see `CLAUDE.md`'s "confirm what's actually flashed" note) — don't assume
+it's still whatever was on it at the end of this session.

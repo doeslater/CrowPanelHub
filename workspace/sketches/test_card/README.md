@@ -131,9 +131,12 @@ plain checkerboard instead:
 python3 sketches/test_card/send_checkerboard.py
 ```
 
-A real send should end with this sketch printing `frame ok, <label>`, and
-the panel should visibly redraw with a centered "Last updated: ..." label
-along the bottom.
+A real send should print `frame ok, <label>` right after the frame's
+checksum passes — before the panel actually redraws, not after, so an
+Android client (or anyone watching `arduino-cli monitor`) sees confirmation
+within a second or two rather than waiting out the full multi-second
+e-paper refresh. The panel itself redraws shortly afterward, ending with a
+centered "Last updated: ..." label along the bottom.
 
 ## Previewing without hardware
 

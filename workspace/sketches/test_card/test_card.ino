@@ -358,7 +358,7 @@ void loop() {
   char label[40];  // needs 34 bytes; a smaller buffer would silently cut the text short
   strftime(label, sizeof(label), "Last updated: %Y-%m-%d %H:%M:%S", &tm_info);
 
-  renderPayload(payload_buffer, label);
   Serial.print("frame ok, ");
   Serial.println(label);
+  renderPayload(payload_buffer, label);
 }

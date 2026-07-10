@@ -88,17 +88,19 @@ fun MainScreen(
             Text("Send Checkerboard")
         }
 
+        Button(
+            onClick = { onAction(MainAction.OnResetBoardClick) },
+            enabled = state.isConnected && !state.isBusy,
+        ) {
+            Text("Reset Board")
+        }
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             if (state.isBusy) {
-                val progress = state.progressFraction
-                if (progress != null) {
-                    CircularProgressIndicator(progress = { progress })
-                } else {
-                    CircularProgressIndicator()
-                }
+                CircularProgressIndicator()
             }
 
             Text(

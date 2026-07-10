@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,6 +25,10 @@ import kotlinx.coroutines.withContext
 
 private const val BAUD_RATE = 115200
 private const val WRITE_TIMEOUT_MS = 5_000
+private const val READ_ACK_TIMEOUT_MS = 3_000
+private const val MAX_SEND_ATTEMPTS = 3
+private const val RECONNECT_DELAY_MS = 2_000L
+private const val RESET_PULSE_MS = 100L
 private const val MAX_LOG_ENTRIES = 100
 
 data class LogEntry(val timestamp: Long, val message: String)
@@ -48,10 +53,11 @@ fun UsbConnectionState.toStatusText(): String = when (this) {
 }
 
 /**
- * Talks to the CrowPanel board over USB serial via usb-serial-for-android. No
- * disconnect()/reconnect handling -- there's no Disconnect button in this app,
- * so the port just stays open once connected; if the cable is pulled, the next
- * sendImage() call simply fails.
+ * Talks to the CrowPanel board over USB serial via usb-serial-for-android.
+ * There's still no Disconnect button in this app -- the port just stays open
+ * once connected -- but sendImage() reconnects on its own if a write fails,
+ * since that's the signature of the flaky-cable link dropping mid-session
+ * (see docs/usb-reliability-fix-plan.md).
  */
 @Singleton
 class UsbSerialTransport @Inject constructor(
@@ -110,19 +116,134 @@ class UsbSerialTransport @Inject constructor(
         }
     }
 
-    suspend fun sendImage(payload: ByteArray): Result<Unit> = withContext(Dispatchers.IO) {
+    /**
+     * Writes one wire-protocol frame and waits for test_card.ino's ack line.
+     * A write failure (the flaky-cable case) triggers a full reconnect and
+     * retry, up to MAX_SEND_ATTEMPTS total. A write that succeeds but gets no
+     * ack, or an explicit "frame dropped: ..." rejection, is NOT retried --
+     * that's not a link problem, so it's surfaced as-is (see
+     * docs/usb-reliability-fix-plan.md for why these are treated differently).
+     * onStatus reports human-readable phase text as it happens, since the
+     * caller has no other way to show real progress for a multi-attempt send.
+     */
+    suspend fun sendImage(payload: ByteArray, onStatus: (String) -> Unit = {}): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            val frame = WireFrame.build(payload)
+            for (attempt in 1..MAX_SEND_ATTEMPTS) {
+                val activePort = port
+                if (activePort == null) {
+                    log("Send failed: not connected")
+                    return@withContext Result.failure(IllegalStateException("Not connected"))
+                }
+
+                val attemptMessage = "Sending frame (attempt $attempt/$MAX_SEND_ATTEMPTS)..."
+                onStatus(attemptMessage)
+                log(attemptMessage)
+
+                val writeFailure = runCatching { activePort.write(frame, WRITE_TIMEOUT_MS) }.exceptionOrNull()
+                if (writeFailure != null) {
+                    log("Write failed: ${writeFailure.message}")
+                    if (attempt == MAX_SEND_ATTEMPTS) {
+                        val message = "Failed after $MAX_SEND_ATTEMPTS attempts -- check the USB connection"
+                        onStatus(message)
+                        return@withContext Result.failure(IllegalStateException(message))
+                    }
+                    onStatus("USB error, reconnecting... (attempt ${attempt + 1}/$MAX_SEND_ATTEMPTS)")
+                    delay(RECONNECT_DELAY_MS)
+                    reconnect()
+                    continue
+                }
+
+                onStatus("Sent -- waiting for board confirmation...")
+                log("Frame written, awaiting ack...")
+                val response = readAckLine(activePort)
+                return@withContext when {
+                    response == null -> {
+                        log("No ack received within ${READ_ACK_TIMEOUT_MS}ms")
+                        val message = "Board didn't confirm -- it may be running different firmware"
+                        onStatus(message)
+                        Result.failure(IllegalStateException(message))
+                    }
+                    response.startsWith("frame ok") -> {
+                        log(response)
+                        onStatus("Confirmed: frame ok")
+                        Result.success(Unit)
+                    }
+                    response.startsWith("frame dropped") -> {
+                        log(response)
+                        val message = "Board rejected frame: ${response.removePrefix("frame dropped: ")}"
+                        onStatus(message)
+                        Result.failure(IllegalStateException(message))
+                    }
+                    else -> {
+                        log("Unexpected response: $response")
+                        val message = "Board didn't confirm -- it may be running different firmware"
+                        onStatus(message)
+                        Result.failure(IllegalStateException(message))
+                    }
+                }
+            }
+            // Unreachable in practice -- every branch above returns -- but the
+            // compiler can't see that a bounded for-loop always exits early here.
+            Result.failure(IllegalStateException("Failed after $MAX_SEND_ATTEMPTS attempts -- check the USB connection"))
+        }
+
+    /**
+     * Reads lines until one is test_card.ino's actual ack/rejection
+     * ("frame ok"/"frame dropped"), waiting up to READ_ACK_TIMEOUT_MS total.
+     * Any other line is discarded, not returned -- a board that just reset
+     * (e.g. from resetBoard(), or a prior send) still has its ROM/app boot
+     * banner and the boot self-test's own debug prints in the pipe, and none
+     * of that is the response to *this* frame.
+     * usb-serial-for-android's read() returns whatever bytes are available
+     * within its own timeout, which may be less than a full line, so this
+     * accumulates across calls until a newline shows up.
+     */
+    private fun readAckLine(activePort: UsbSerialPort): String? {
+        val deadline = System.currentTimeMillis() + READ_ACK_TIMEOUT_MS
+        val buffer = ByteArray(256)
+        val builder = StringBuilder()
+        while (System.currentTimeMillis() < deadline) {
+            val remaining = (deadline - System.currentTimeMillis()).toInt().coerceAtLeast(1)
+            val bytesRead = runCatching { activePort.read(buffer, remaining) }.getOrDefault(0)
+            if (bytesRead > 0) {
+                builder.append(String(buffer, 0, bytesRead, Charsets.US_ASCII))
+                while (true) {
+                    val newlineIndex = builder.indexOf("\n")
+                    if (newlineIndex < 0) break
+                    val line = builder.substring(0, newlineIndex).trim()
+                    builder.delete(0, newlineIndex + 1)
+                    if (line.startsWith("frame ok") || line.startsWith("frame dropped")) return line
+                }
+            }
+        }
+        return null
+    }
+
+    /** Tears down the stale port and re-runs discovery + open, same as connect(). */
+    private suspend fun reconnect() {
+        log("Reconnecting...")
+        runCatching { port?.close() }
+        port = null
+        connect()
+    }
+
+    /** Soft-reboots the board via a DTR/RTS pulse -- same trick serial_sender.py uses. No reflash. */
+    suspend fun resetBoard(): Result<Unit> = withContext(Dispatchers.IO) {
         val activePort = port
         if (activePort == null) {
-            log("Send failed: not connected")
+            log("Reset failed: not connected")
             return@withContext Result.failure(IllegalStateException("Not connected"))
         }
-        log("Sending image (${payload.size} bytes)...")
+        log("Resetting board...")
         runCatching {
-            activePort.write(WireFrame.build(payload), WRITE_TIMEOUT_MS)
+            activePort.setRTS(true)
+            Thread.sleep(RESET_PULSE_MS)
+            activePort.setRTS(false)
         }.onSuccess {
-            log("Image sent successfully")
+            log("Board reset")
         }.onFailure { e ->
-            log("Send failed: ${e.message}")
+            log("Reset failed: ${e.message}")
         }
     }
 
