@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Working style
 
-Before taking any action (running a command, flashing firmware, sending a serial frame, editing a file), state the plan and wait for an explicit go-ahead — don't chain an action onto an answer on your own initiative, even a small or reversible one. Answering questions or reading/explaining code doesn't need this.
+Before taking any action (running a command, flashing firmware, sending a serial frame, editing a file), state the plan and wait for an explicit go-ahead — don't chain an action onto an answer on your own initiative, even a small or reversible one. Answering questions or reading/explaining code doesn't need this. A go-ahead only counts if the plan was actually understood in plain English, not just approved — if an explanation doesn't land, stop and re-explain rather than proceeding.
 
 For multi-step or multi-file work, state the full plan up front (which files, what changes, how it'll be verified) and get **one** explicit go-ahead for the whole batch, rather than checking in after each individual file — then execute without stopping again mid-way. Answering a clarifying/design question (e.g. picking between options) is **not** itself a go-ahead to start implementing — a separate, explicit go-ahead is still required before execution begins. While executing an approved plan, narrate the reasoning behind choices as they're made (why this approach, why this file, what a step revealed) rather than just reporting a log of actions taken afterward.
 
