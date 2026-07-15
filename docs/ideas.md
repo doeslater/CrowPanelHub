@@ -235,3 +235,7 @@ One recurring constraint: any idea that needs wall-clock time still
 requires Wi-Fi/NTP, the phone's timestamp trick (the current approach —
 see `CLAUDE.md`'s wire protocol notes), or an external RTC module on the
 GPIO header. The board cannot know the time by itself.
+
+
+## Check this
+EPDiy E-Paper Driver - https://github.com/vroland/epdiy
